@@ -40,10 +40,14 @@ export function PlatformTile({
   id,
   selected,
   onToggle,
+  role = 'checkbox',
+  testID,
 }: {
   id: PlatformId;
   selected: boolean;
   onToggle: (id: PlatformId) => void;
+  role?: 'checkbox' | 'radio';
+  testID?: string;
 }) {
   const { t } = useTranslation();
   const { colors, radii, spacing } = useTheme();
@@ -52,13 +56,13 @@ export function PlatformTile({
   return (
     <Pressable
       onPress={() => onToggle(id)}
-      accessibilityRole="checkbox"
-      accessibilityState={{ checked: selected }}
+      accessibilityRole={role}
+      accessibilityState={role === 'radio' ? { selected } : { checked: selected }}
       accessibilityLabel={t('platforms.a11y', {
         name,
         state: selected ? t('common.selected') : t('common.notSelected'),
       })}
-      testID={`platform-${id}`}
+      testID={testID ?? `platform-${id}`}
       style={({ pressed }) => [
         styles.tile,
         {

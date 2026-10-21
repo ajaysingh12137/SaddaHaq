@@ -55,3 +55,21 @@ may be `null` for the worker to fill in.
 
 Fixtures in `src/__tests__/fixtures/ocr/` are synthetic; extend them with
 anonymised real OCR output during field testing.
+
+## On-device OCR (`apps/mobile`)
+
+Screenshots are read by a small app-local TurboModule, not an npm wrapper:
+
+- JS spec: `apps/mobile/src/specs/NativeTextRecognizer.ts` (codegen, `codegenConfig` in
+  `apps/mobile/package.json`).
+- Android: `android/app/src/main/java/com/saddahaq/ocr/`. Runs Google ML Kit's Latin and
+  Devanagari recognisers off the JS thread and joins their text.
+- Models come from Google Play services (`play-services-mlkit-text-recognition*`), about
+  260 KB per script in the APK instead of about 4 MB per script per ABI when bundled
+  (figures from Google's ML Kit docs). The manifest's `com.google.mlkit.vision.DEPENDENCIES`
+  meta-data asks Play to download them at install. Until a model is ready, recognition
+  fails with `unavailable` and the app tells the worker to log by tapping.
+- The picker (`react-native-image-picker`) returns a copy downscaled to at most
+  1080×1920. The native module deletes that copy from the app cache after reading it. It
+  never touches gallery files. The recognised text is parsed in memory and never stored.
+- iOS has no implementation yet; the app reports screenshot reading as unsupported there.

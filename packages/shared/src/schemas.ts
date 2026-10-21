@@ -40,6 +40,7 @@ export const otpSchema = z.string().regex(/^\d{6}$/, 'OTP must be 6 digits');
 
 export const LOG_SOURCES = ['tap', 'ocr'] as const;
 export const logSourceSchema = z.enum(LOG_SOURCES);
+export type LogSource = z.infer<typeof logSourceSchema>;
 
 export const dayLogSchema = z.object({
   /** UUID v4 generated on the device. */

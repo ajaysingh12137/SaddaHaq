@@ -10,6 +10,8 @@ const transpile = [
   '@op-engineering',
   '@mhpdev',
   'react-native-get-random-values',
+  'react-native-image-picker',
+  '@shopify',
   'i18next',
   'react-i18next',
   'zustand',

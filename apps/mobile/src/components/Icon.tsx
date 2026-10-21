@@ -58,6 +58,17 @@ const ICONS = {
       <Path d="M12 11v6M12 7.5h.01" />
     </>
   ),
+  close: <Path d="M6 6l12 12M18 6 6 18" />,
+  chevronLeft: <Path d="m15 5-7 7 7 7" />,
+  chevronRight: <Path d="m9 5 7 7-7 7" />,
+  image: (
+    <>
+      <Rect x={3} y={4} width={18} height={16} rx={2} />
+      <Circle cx={9} cy={10} r={1.8} />
+      <Path d="m21 16-5-5-9 9" />
+    </>
+  ),
+  trash: <Path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />,
 } as const;
 
 export type IconName = keyof typeof ICONS;

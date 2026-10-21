@@ -48,5 +48,16 @@ jest.mock(
   () => require('react-native-safe-area-context/jest/mock').default,
 );
 
+jest.mock('react-native-image-picker', () => ({
+  launchImageLibrary: jest.fn(async () => ({ didCancel: true })),
+  launchCamera: jest.fn(async () => ({ didCancel: true })),
+}));
+
+// No native OCR in Jest; tests that need it mock this module with a recognizer.
+jest.mock('../src/specs/NativeTextRecognizer', () => ({ __esModule: true, default: null }));
+
+// FlashList needs layout sizes, which Jest has none of.
+require('@shopify/flash-list/jestSetup');
+
 // Node already provides crypto.getRandomValues.
 jest.mock('react-native-get-random-values', () => ({}));

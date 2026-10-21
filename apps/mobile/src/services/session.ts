@@ -10,6 +10,7 @@ import { openDatabase } from '../db/database';
 import { kvDelete, kvGet, kvSet } from '../db/kv';
 import { initI18n } from '../i18n';
 import { clearTokens } from '../security/secureStore';
+import { loadLogs } from '../state/logsStore';
 import { setSession, useSession } from '../state/sessionStore';
 import { api, onAuthLost, tokenStore } from './api';
 
@@ -31,6 +32,7 @@ export async function bootstrap(): Promise<void> {
     tokenStore.get(),
   ]);
   await initI18n(language ?? undefined);
+  await loadLogs();
 
   onAuthLost(() => {
     void handleAuthLost();

@@ -117,4 +117,12 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+
+    // On-device OCR (src/main/java/com/saddahaq/ocr). Play services variants keep the
+    // APK small; models download at install time (see AndroidManifest meta-data).
+    implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.1")
+    implementation("com.google.android.gms:play-services-mlkit-text-recognition-devanagari:16.0.1")
+
+    // Backported AndroidX Photo Picker for react-native-image-picker below API 30.
+    implementation("androidx.activity:activity:1.9.+")
 }
