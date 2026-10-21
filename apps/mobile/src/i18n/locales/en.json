@@ -1,0 +1,100 @@
+{
+  "common": {
+    "continue": "Continue",
+    "back": "Back",
+    "retry": "Try again",
+    "loading": "Loading…",
+    "offline": "You are offline. Your logs are saved on this phone.",
+    "readAloud": "Read aloud",
+    "stopReading": "Stop reading",
+    "selected": "selected",
+    "notSelected": "not selected",
+    "on": "on",
+    "off": "off"
+  },
+  "language": {
+    "title": "Choose your language",
+    "subtitle": "You can change this later in Settings.",
+    "hi": "हिन्दी",
+    "en": "English",
+    "a11y": "{{language}}, {{state}}"
+  },
+  "phone": {
+    "title": "Your mobile number",
+    "subtitle": "We will send a 6-digit code by SMS.",
+    "label": "Mobile number",
+    "prefix": "+91",
+    "invalid": "Enter a valid 10-digit mobile number.",
+    "send": "Send code",
+    "privacy": "We never ask for Aadhaar, bank details or app passwords.",
+    "needInternet": "You need internet to sign in."
+  },
+  "otp": {
+    "title": "Enter the code",
+    "subtitle": "Sent to +91 {{phone}}",
+    "label": "6-digit code",
+    "verify": "Verify",
+    "resendIn": "Send again in {{seconds}} s",
+    "resend": "Send code again",
+    "changeNumber": "Change number"
+  },
+  "platforms": {
+    "title": "Which apps do you work on?",
+    "subtitle": "Choose all that apply. You can change this later.",
+    "other": "Other",
+    "pickOne": "Choose at least one app.",
+    "a11y": "{{name}}, {{state}}"
+  },
+  "consent": {
+    "title": "Your data, your choice",
+    "storeTitle": "What we keep",
+    "storeBody": "Your mobile number (hidden), the apps you work on, and the days you worked.",
+    "neverTitle": "What we never take",
+    "neverBody": "No Aadhaar number, bank details, app passwords, contacts or location.",
+    "whyTitle": "Why",
+    "whyBody": "So you can see how close you are to {{single}} days on one app or {{multi}} days in total.",
+    "screenshotTitle": "Screenshots",
+    "screenshotBody": "Earnings screenshots are read only on this phone and never sent anywhere.",
+    "deleteTitle": "Deleting",
+    "deleteBody": "In Settings you can delete your account and all your data at any time.",
+    "estimateNote": "This app only estimates from your own records. The government decides who is eligible.",
+    "backupTitle": "Back up my logs online",
+    "backupBody": "Keeps a copy of your work days on our server, so you do not lose them if you change phones.",
+    "analyticsTitle": "Share anonymous usage data",
+    "analyticsBody": "Helps us improve the app. Never includes your number or your logs.",
+    "agree": "I agree, continue"
+  },
+  "tabs": {
+    "home": "Home",
+    "log": "Log",
+    "schemes": "Schemes",
+    "settings": "Settings"
+  },
+  "home": {
+    "empty": "No days logged yet — tap + to add today"
+  },
+  "placeholder": {
+    "comingSoon": "This screen is being built."
+  },
+  "errors": {
+    "network": "No internet connection. Please try again.",
+    "timeout": "The server took too long. Please try again.",
+    "server": "Something went wrong. Please try again.",
+    "otp_invalid": "The code is wrong or has expired.",
+    "otp_locked": "Too many wrong tries. Ask for a new code.",
+    "otp_cooldown": "Please wait {{seconds}} seconds before asking again.",
+    "otp_delivery_failed": "Could not send the SMS. Please try again.",
+    "rate_limited": "Too many tries. Please wait a while and try again.",
+    "validation_error": "Please check what you entered.",
+    "sessionExpired": "Please sign in again."
+  },
+  "tts": {
+    "noVoice": "A voice for this language is not installed on your phone.",
+    "installVoice": "Install voice",
+    "failed": "Could not read aloud."
+  },
+  "startup": {
+    "failed": "The app could not start.",
+    "retry": "Try again"
+  }
+}

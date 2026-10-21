@@ -1,0 +1,41 @@
+{
+  "name": "saddahaq",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SaddaHaQ — social security benefits helper for India's gig workers",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">= 22.11.0"
+  },
+  "scripts": {
+    "build:shared": "npm run build --workspace=@saddahaq/shared",
+    "dev": "npm run build:shared && npm run dev --workspace=@saddahaq/api",
+    "seed": "npm run build:shared && npm run seed --workspace=@saddahaq/api",
+    "mobile": "npm run start --workspace=@saddahaq/mobile",
+    "android": "npm run android --workspace=@saddahaq/mobile",
+    "lint": "eslint . --max-warnings=0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "npm run build:shared && npm run typecheck --workspaces --if-present",
+    "test": "npm run build:shared && npm run test --workspaces --if-present"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "eslint": "^9.39.5",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.13.0",
+    "prettier": "^3.9.10",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.71.2"
+  },
+  "allowScripts": {
+    "esbuild": false,
+    "mongodb-memory-server": false
+  },
+  "overrides": {
+    "react": "19.2.3"
+  }
+}
