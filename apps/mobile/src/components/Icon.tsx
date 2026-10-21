@@ -69,6 +69,20 @@ const ICONS = {
     </>
   ),
   trash: <Path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />,
+  fileText: <Path d="M6 3h8l4 4v14H6zM14 3v4h4M9 12h6M9 16h6" />,
+  bank: <Path d="M3 10 12 4l9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18" />,
+  idCard: (
+    <>
+      <Rect x={3} y={5} width={18} height={14} rx={2} />
+      <Circle cx={9} cy={11} r={2} />
+      <Path d="M6 16c.6-1.5 1.7-2 3-2s2.4.5 3 2M14 10h4M14 14h3" />
+    </>
+  ),
+  download: <Path d="M12 4v11M7 10l5 5 5-5M5 20h14" />,
+  external: <Path d="M14 4h6v6M20 4l-9 9M18 14v6H4V6h6" />,
+  call: (
+    <Path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z" />
+  ),
 } as const;
 
 export type IconName = keyof typeof ICONS;

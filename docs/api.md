@@ -12,7 +12,8 @@ npm run dev          # API on http://localhost:4000
 ```
 
 With `MONGO_URI` unset, `npm run dev` starts an **in-memory MongoDB** and seeds
-placeholder content automatically (data is lost on stop). OTPs are printed to the
+placeholder content from `packages/shared/src/content/placeholder.ts` automatically
+(data is lost on stop). The app bundles the same content as its offline fallback. OTPs are printed to the
 server log by the console provider (`devOtp: "123456"`).
 
 To use a real database, copy `apps/api/.env.example` to `apps/api/.env`, set

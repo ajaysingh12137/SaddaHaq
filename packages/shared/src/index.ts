@@ -4,3 +4,4 @@ export * from './phone';
 export * from './eligibility';
 export * from './ocr/parser';
 export * from './schemas';
+export * from './content/placeholder';

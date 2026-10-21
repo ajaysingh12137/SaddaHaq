@@ -1,3 +1,5 @@
+import os from 'node:os';
+
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
 import { type Logger } from 'pino';
@@ -83,7 +85,11 @@ export function useTestDatabase(): void {
 
   beforeAll(async () => {
     server = await MongoMemoryServer.create();
-    await mongoose.connect(server.getUri('saddahaq-test'));
+    await mongoose.connect(server.getUri('saddahaq-test'), {
+      // The driver loads `os` with a dynamic import(), which Jest's CommonJS sandbox
+      // rejects; it then sends empty handshake metadata and mongod refuses to connect.
+      runtimeAdapters: { os },
+    });
     await mongoose.connection.syncIndexes();
   });
 

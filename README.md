@@ -3,8 +3,11 @@
 Helps India's gig and platform workers register on e-Shram, log their working
 days per platform, and track progress toward social-security eligibility.
 
-> Status: Phase 4 of 6 — shared logic, API, onboarding, day logging, screenshot OCR and
-> the eligibility meter are done. e-Shram guide, schemes, settings, sync and release follow.
+> Status: Phase 5 of 6 — shared logic, API, onboarding, day logging, screenshot OCR, the
+> eligibility meter, e-Shram guide, schemes and settings are done. Sync and release follow.
+>
+> All scheme and e-Shram content is PLACEHOLDER (`packages/shared/src/content/placeholder.ts`).
+> Replace it with text checked against the official portal before any worker uses the app.
 
 ## Layout
 

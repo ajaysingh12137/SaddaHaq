@@ -6,13 +6,14 @@
 import { type Language, type PlatformId, type User, type UserPatch } from '@saddahaq/shared';
 
 import { ApiError } from '../api/errors';
-import { openDatabase } from '../db/database';
+import { destroyDatabase, openDatabase } from '../db/database';
 import { kvDelete, kvGet, kvSet } from '../db/kv';
 import { initI18n } from '../i18n';
 import { clearTokens } from '../security/secureStore';
-import { loadLogs } from '../state/logsStore';
-import { setSession, useSession } from '../state/sessionStore';
+import { loadLogs, resetLogsStore } from '../state/logsStore';
+import { resetSessionStore, setSession, useSession } from '../state/sessionStore';
 import { api, onAuthLost, tokenStore } from './api';
+import { loadCachedContent } from './content';
 
 const KEYS = {
   language: 'settings.language',
@@ -32,7 +33,7 @@ export async function bootstrap(): Promise<void> {
     tokenStore.get(),
   ]);
   await initI18n(language ?? undefined);
-  await loadLogs();
+  await Promise.all([loadLogs(), loadCachedContent()]);
 
   onAuthLost(() => {
     void handleAuthLost();
@@ -186,4 +187,32 @@ export async function signOut(): Promise<void> {
   await kvDelete(KEYS.user);
   await kvDelete(KEYS.pendingPatch);
   await handleAuthLost();
+}
+
+export async function setEshramRegistered(registered: boolean): Promise<void> {
+  await queueProfilePatch({ eshramRegistered: registered });
+}
+
+/** Changes the backup/analytics consents. Turning backup off makes the server delete its copy. */
+export async function setConsents(consents: {
+  backup: boolean;
+  analytics: boolean;
+}): Promise<void> {
+  await queueProfilePatch({ consents: { ...consents, acceptedAt: new Date().toISOString() } });
+}
+
+/**
+ * Deletes the account on the server (which hard-deletes all server data), then
+ * wipes this phone: tokens, the encrypted database and its key. The app starts
+ * again from the language screen. Throws, changing nothing locally, if the
+ * server call fails (e.g. offline).
+ */
+export async function deleteAccount(): Promise<void> {
+  await api().deleteMe();
+  tokenStore.forget();
+  await clearTokens();
+  await destroyDatabase();
+  resetLogsStore();
+  resetSessionStore();
+  await bootstrap();
 }

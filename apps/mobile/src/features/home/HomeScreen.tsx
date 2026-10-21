@@ -1,3 +1,5 @@
+import { useNavigation } from '@react-navigation/native';
+import { type NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
@@ -12,12 +14,17 @@ import {
 import { AppText } from '../../components/AppText';
 import { Button } from '../../components/Button';
 import { EmptyState } from '../../components/EmptyState';
+import { Icon } from '../../components/Icon';
+import { InfoBanner } from '../../components/InfoBanner';
 import { PlatformBadge, usePlatformName } from '../../components/PlatformTile';
 import { ProgressRing } from '../../components/ProgressRing';
 import { ReadAloudButton } from '../../components/ReadAloudButton';
 import { Screen } from '../../components/Screen';
 import { ScreenHeader } from '../../components/ScreenHeader';
+import { APP_VERSION } from '../../config/version';
 import { useToday } from '../../hooks/useToday';
+import { type MainStackParamList } from '../../navigation/types';
+import { compareVersions, useContent } from '../../services/content';
 import { useLogs } from '../../state/logsStore';
 import { useSession } from '../../state/sessionStore';
 import { useTheme } from '../../theme/ThemeProvider';
@@ -111,6 +118,40 @@ function PlatformBars({
   );
 }
 
+/** Shown until the worker says they are registered: e-Shram is the first step to any benefit. */
+function EshramCard({ onOpen }: { onOpen: () => void }) {
+  const { t } = useTranslation();
+  const { colors, radii, spacing } = useTheme();
+  return (
+    <View
+      testID="home-eshram-card"
+      style={{
+        gap: spacing.sm,
+        padding: spacing.md,
+        borderRadius: radii.md,
+        backgroundColor: colors.accentSoft,
+      }}
+    >
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+        <Icon name="idCard" color={colors.onAccentSoft} />
+        <AppText variant="bodyLarge" weight="bold" color={colors.onAccentSoft} style={{ flex: 1 }}>
+          {t('eshram.cardTitle')}
+        </AppText>
+      </View>
+      <AppText variant="body" color={colors.onAccentSoft}>
+        {t('eshram.cardBody')}
+      </AppText>
+      <Button
+        variant="ghost"
+        icon="arrowRight"
+        label={t('eshram.open')}
+        onPress={onOpen}
+        testID="home-open-eshram"
+      />
+    </View>
+  );
+}
+
 export function HomeScreen() {
   const { t } = useTranslation();
   const { colors, spacing, radii } = useTheme();
@@ -118,6 +159,10 @@ export function HomeScreen() {
   const config = useSession(s => s.eligibilityConfig);
   const logs = useLogs(s => s.logs);
   const [logToday, setLogToday] = useState(false);
+  const navigation = useNavigation<NativeStackNavigationProp<MainStackParamList>>();
+  const registered = useSession(s => s.user?.eshramRegistered ?? false);
+  const { appConfig } = useContent();
+  const updateNeeded = compareVersions(APP_VERSION, appConfig.minAppVersion) < 0;
 
   const result = useMemo(() => computeEligibility(logs, config, { today }), [logs, config, today]);
   const { status, secondary, ringLabel, primary } = useMeterText(result);
@@ -148,6 +193,8 @@ export function HomeScreen() {
         title={t('home.title')}
         subtitle={t('home.fyLabel', { label: result.fy.label })}
       />
+      {updateNeeded ? <InfoBanner tone="warning" message={t('settings.updateNeeded')} /> : null}
+      {registered ? null : <EshramCard onOpen={() => navigation.navigate('EshramGuide')} />}
 
       {result.status === 'no_logs' ? (
         <EmptyState icon="calendar" message={t('home.empty')} />

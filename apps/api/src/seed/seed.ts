@@ -1,5 +1,5 @@
 import { AppConfigModel, EshramStepModel, SchemeModel } from '../models/content';
-import { SEED_APP_CONFIG, SEED_ESHRAM_STEPS, SEED_SCHEMES } from './content';
+import { SEED_APP_CONFIG, SEED_ESHRAM_STEPS, SEED_SCHEMES } from '@saddahaq/shared';
 
 export interface SeedSummary {
   schemes: number;
@@ -12,15 +12,20 @@ export interface SeedSummary {
  * Re-running it is safe.
  */
 export async function seedContent(now: Date): Promise<SeedSummary> {
-  for (const scheme of SEED_SCHEMES) {
-    await SchemeModel.updateOne({ slug: scheme.slug }, { $set: scheme }, { upsert: true });
+  // The public id is stored as the slug.
+  for (const { id, ...scheme } of SEED_SCHEMES) {
+    await SchemeModel.updateOne({ slug: id }, { $set: { slug: id, ...scheme } }, { upsert: true });
   }
-  await SchemeModel.deleteMany({ slug: { $nin: SEED_SCHEMES.map(s => s.slug) } });
+  await SchemeModel.deleteMany({ slug: { $nin: SEED_SCHEMES.map(s => s.id) } });
 
-  for (const step of SEED_ESHRAM_STEPS) {
-    await EshramStepModel.updateOne({ slug: step.slug }, { $set: step }, { upsert: true });
+  for (const { id, ...step } of SEED_ESHRAM_STEPS) {
+    await EshramStepModel.updateOne(
+      { slug: id },
+      { $set: { slug: id, ...step } },
+      { upsert: true },
+    );
   }
-  await EshramStepModel.deleteMany({ slug: { $nin: SEED_ESHRAM_STEPS.map(s => s.slug) } });
+  await EshramStepModel.deleteMany({ slug: { $nin: SEED_ESHRAM_STEPS.map(s => s.id) } });
 
   await AppConfigModel.updateOne(
     { key: 'default' },

@@ -1,6 +1,7 @@
 import {
   type UserPatch,
   authResponseSchema,
+  contentResponseSchema,
   otpRequestResponseSchema,
   userSchema,
 } from '@saddahaq/shared';
@@ -27,6 +28,13 @@ export function createEndpoints(client: ApiClient) {
     getMe: () => client.get('/me', { schema: userSchema }),
     patchMe: (patch: UserPatch) => client.patch('/me', { body: patch, schema: userSchema }),
     deleteMe: () => client.delete('/me'),
+    /** Public. Resolves `undefined` (304) when nothing changed since `since`. */
+    getContent: (since: string | null) =>
+      client.get(since ? `/content?since=${encodeURIComponent(since)}` : '/content', {
+        auth: false,
+        schema: contentResponseSchema,
+        allowNotModified: true,
+      }),
   };
 }
 

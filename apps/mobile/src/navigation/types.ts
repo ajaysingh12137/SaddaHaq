@@ -14,3 +14,10 @@ export type MainTabParamList = {
   Schemes: undefined;
   Settings: undefined;
 };
+
+/** Full-screen pages opened above the tabs. */
+export type MainStackParamList = {
+  Tabs: undefined;
+  EshramGuide: undefined;
+  SchemeDetail: { id: string };
+};

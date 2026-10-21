@@ -1,9 +1,14 @@
 /**
- * Seed content. EVERYTHING HERE IS PLACEHOLDER — verify against official
- * sources before launch. No benefit amounts, helpline numbers or scheme URLs
- * are included on purpose; fill them only from verified official sources.
- * Hindi copy also needs review by a native speaker.
+ * Placeholder content: the API seeds its database from it and the app bundles it
+ * as the offline fallback until it has fetched /content once.
+ *
+ * EVERYTHING HERE IS PLACEHOLDER — verify against official sources before
+ * launch. No benefit amounts, helpline numbers or scheme URLs are included on
+ * purpose; fill them only from verified official sources. Hindi copy also needs
+ * review by a native speaker.
  */
+
+import { type AppConfig, type EshramStep, type Scheme } from '../schemas';
 
 export const SEED_AUTHORED_ON = '2026-10-15';
 
@@ -37,9 +42,9 @@ function placeholderName(hi: string, en: string) {
   return { hi: PLACEHOLDER_PREFIX.hi + hi, en: PLACEHOLDER_PREFIX.en + en };
 }
 
-export const SEED_SCHEMES = [
+export const SEED_SCHEMES: Scheme[] = [
   {
-    slug: 'placeholder-accident-cover',
+    id: 'placeholder-accident-cover',
     order: 1,
     name: placeholderName('दुर्घटना बीमा', 'Accident cover'),
     covers: {
@@ -48,7 +53,7 @@ export const SEED_SCHEMES = [
     },
   },
   {
-    slug: 'placeholder-life-cover',
+    id: 'placeholder-life-cover',
     order: 2,
     name: placeholderName('जीवन बीमा', 'Life cover'),
     covers: {
@@ -57,7 +62,7 @@ export const SEED_SCHEMES = [
     },
   },
   {
-    slug: 'placeholder-health-cover',
+    id: 'placeholder-health-cover',
     order: 3,
     name: placeholderName('स्वास्थ्य सहायता', 'Health cover'),
     covers: {
@@ -66,7 +71,7 @@ export const SEED_SCHEMES = [
     },
   },
   {
-    slug: 'placeholder-maternity-support',
+    id: 'placeholder-maternity-support',
     order: 4,
     name: placeholderName('मातृत्व सहायता', 'Maternity support'),
     covers: {
@@ -75,7 +80,7 @@ export const SEED_SCHEMES = [
     },
   },
   {
-    slug: 'placeholder-old-age-support',
+    id: 'placeholder-old-age-support',
     order: 5,
     name: placeholderName('बुढ़ापे की सुरक्षा', 'Old-age support'),
     covers: {
@@ -94,9 +99,9 @@ export const SEED_SCHEMES = [
   placeholder: true,
 }));
 
-export const SEED_ESHRAM_STEPS = [
+export const SEED_ESHRAM_STEPS: EshramStep[] = [
   {
-    slug: 'documents',
+    id: 'documents',
     illustration: 'documents',
     title: { hi: 'काग़ज़ तैयार रखें', en: 'Keep your documents ready' },
     body: {
@@ -105,7 +110,7 @@ export const SEED_ESHRAM_STEPS = [
     },
   },
   {
-    slug: 'open-portal',
+    id: 'open-portal',
     illustration: 'browser',
     title: { hi: 'ई-श्रम वेबसाइट खोलें', en: 'Open the e-Shram website' },
     body: {
@@ -114,7 +119,7 @@ export const SEED_ESHRAM_STEPS = [
     },
   },
   {
-    slug: 'mobile-otp',
+    id: 'mobile-otp',
     illustration: 'phone-otp',
     title: { hi: 'मोबाइल नंबर डालें', en: 'Enter your mobile number' },
     body: {
@@ -123,7 +128,7 @@ export const SEED_ESHRAM_STEPS = [
     },
   },
   {
-    slug: 'aadhaar',
+    id: 'aadhaar',
     illustration: 'id-card',
     title: { hi: 'आधार की पुष्टि करें', en: 'Confirm your Aadhaar' },
     body: {
@@ -132,7 +137,7 @@ export const SEED_ESHRAM_STEPS = [
     },
   },
   {
-    slug: 'personal-details',
+    id: 'personal-details',
     illustration: 'form',
     title: { hi: 'अपनी जानकारी भरें', en: 'Fill in your details' },
     body: {
@@ -141,7 +146,7 @@ export const SEED_ESHRAM_STEPS = [
     },
   },
   {
-    slug: 'bank-details',
+    id: 'bank-details',
     illustration: 'bank',
     title: { hi: 'बैंक की जानकारी जोड़ें', en: 'Add bank details' },
     body: {
@@ -150,7 +155,7 @@ export const SEED_ESHRAM_STEPS = [
     },
   },
   {
-    slug: 'download-card',
+    id: 'download-card',
     illustration: 'card',
     title: { hi: 'अपना कार्ड डाउनलोड करें', en: 'Download your card' },
     body: {
@@ -159,7 +164,7 @@ export const SEED_ESHRAM_STEPS = [
     },
   },
   {
-    slug: 'mark-registered',
+    id: 'mark-registered',
     illustration: 'check',
     title: { hi: 'ऐप में बताएँ', en: 'Tell the app' },
     body: {
@@ -174,7 +179,7 @@ export const SEED_ESHRAM_STEPS = [
   placeholder: true,
 }));
 
-export const SEED_APP_CONFIG = {
+export const SEED_APP_CONFIG: AppConfig = {
   minAppVersion: '0.1.0',
   singleThreshold: 90,
   multiThreshold: 120,
