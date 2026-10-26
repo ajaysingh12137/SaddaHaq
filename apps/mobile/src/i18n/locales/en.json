@@ -36,7 +36,9 @@
     "verify": "Verify",
     "resendIn": "Send again in {{seconds}} s",
     "resend": "Send code again",
-    "changeNumber": "Change number"
+    "changeNumber": "Change number",
+    "testMode": "Test login: no SMS is sent. Use code {{code}}.",
+    "useTestCode": "Fill in the test code"
   },
   "platforms": {
     "title": "Which apps do you work on?",
@@ -84,7 +86,8 @@
     "save": "Save",
     "clearDay": "Clear this day",
     "close": "Close",
-    "amountFromScreenshot": "{{platform}}: ₹{{amount}} (from screenshot)"
+    "amountFromScreenshot": "{{platform}}: ₹{{amount}} (from screenshot)",
+    "monthCount": "Days: {{count}}"
   },
   "ocr": {
     "title": "Check the details",
@@ -175,7 +178,8 @@
     "deleteNeedsInternet": "You need internet to delete your account.",
     "deleteFailed": "Could not delete your account. Please try again.",
     "version": "App version {{version}}",
-    "updateNeeded": "A newer version of the app is needed. Please update it from the Play Store."
+    "updateNeeded": "A newer version of the app is needed. Please update it from the Play Store.",
+    "languageVoiceTitle": "Language and voice"
   },
   "dates": {
     "months": {
@@ -220,7 +224,8 @@
     "perPlatformTitle": "Days on each app",
     "barA11y": "{{platform}}: {{days}} days",
     "recordNote": "This is your own record to help you plan. The official count comes from the data apps send to e-Shram.",
-    "rule": "Rule: {{single}} days on one app, or {{multi}} days on all apps together, in one year (April–March)."
+    "rule": "Rule: {{single}} days on one app, or {{multi}} days on all apps together, in one year (April–March).",
+    "greeting": "Namaste"
   },
   "errors": {
     "network": "No internet connection. Please try again.",

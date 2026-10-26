@@ -53,7 +53,7 @@ export function PlatformsScreen({ navigation }: Props) {
         </>
       }
     >
-      <ScreenHeader title={t('platforms.title')} subtitle={t('platforms.subtitle')} />
+      <ScreenHeader title={t('platforms.title')} subtitle={t('platforms.subtitle')} icon="worker" />
       <PlatformGrid ids={PLATFORM_IDS} selected={selected} onToggle={toggle} />
     </Screen>
   );

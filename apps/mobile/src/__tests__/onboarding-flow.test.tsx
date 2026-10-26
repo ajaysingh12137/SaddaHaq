@@ -127,6 +127,33 @@ describe('onboarding', () => {
     expect(server.callsTo('POST /auth/otp/request')).toHaveLength(0);
   });
 
+  it('test login: shows the fixed code and fills it in with one tap', async () => {
+    server.on('POST /auth/otp/request', () => ({
+      status: 202,
+      body: { expiresInSec: 300, resendAfterSec: 60, testCode: '123456' },
+    }));
+    await render(<App />);
+    await fireEvent.press(await screen.findByTestId('language-continue'));
+    await fireEvent.changeText(await screen.findByTestId('phone-input'), '9876543210');
+    await fireEvent.press(screen.getByTestId('phone-send'));
+    expect(await screen.findByTestId('otp-test-mode')).toHaveTextContent(/123456/);
+    await fireEvent.press(screen.getByTestId('otp-use-test-code'));
+    expect(await screen.findByTestId('platforms-screen')).toBeTruthy();
+    expect(server.callsTo('POST /auth/otp/verify')[0]?.body).toEqual({
+      phone: '9876543210',
+      otp: '123456',
+    });
+  });
+
+  it('hides the test-login hint for real SMS logins', async () => {
+    await render(<App />);
+    await fireEvent.press(await screen.findByTestId('language-continue'));
+    await fireEvent.changeText(await screen.findByTestId('phone-input'), '9876543210');
+    await fireEvent.press(screen.getByTestId('phone-send'));
+    await screen.findByTestId('otp-screen');
+    expect(screen.queryByTestId('otp-test-mode')).toBeNull();
+  });
+
   it('shows the server error for a wrong code', async () => {
     server.on('POST /auth/otp/verify', () => ({
       status: 400,

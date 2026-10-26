@@ -16,6 +16,7 @@ export function ProgressRing({
   size = 220,
   strokeWidth = 18,
   color,
+  trackColor,
   accessibilityLabel,
   children,
 }: {
@@ -24,6 +25,7 @@ export function ProgressRing({
   size?: number;
   strokeWidth?: number;
   color?: string;
+  trackColor?: string;
   accessibilityLabel: string;
   children?: React.ReactNode;
 }) {
@@ -63,7 +65,7 @@ export function ProgressRing({
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke={colors.track}
+          stroke={trackColor ?? colors.track}
           strokeWidth={strokeWidth}
           fill="none"
         />

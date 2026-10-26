@@ -9,7 +9,9 @@ import { type Scheme } from '@saddahaq/shared';
 
 import { AppText } from '../../components/AppText';
 import { Button } from '../../components/Button';
-import { Icon } from '../../components/Icon';
+import { Card } from '../../components/Card';
+import { Icon, type IconName } from '../../components/Icon';
+import { IconCircle } from '../../components/IconCircle';
 import { InfoBanner } from '../../components/InfoBanner';
 import { Screen } from '../../components/Screen';
 import { ScreenHeader } from '../../components/ScreenHeader';
@@ -18,8 +20,19 @@ import { formatDate } from '../../lib/dates';
 import { type MainStackParamList } from '../../navigation/types';
 import { useContent } from '../../services/content';
 import { useTheme } from '../../theme/ThemeProvider';
+import { cardShadow } from '../../theme/tokens';
 
 type Navigation = NativeStackNavigationProp<MainStackParamList>;
+
+/** A picture for each kind of benefit, matched from the scheme id (content has no icon field). */
+function schemeIcon(id: string): IconName {
+  if (id.includes('accident')) return 'accident';
+  if (id.includes('life')) return 'life';
+  if (id.includes('health')) return 'health';
+  if (id.includes('maternity')) return 'maternity';
+  if (id.includes('old-age') || id.includes('pension')) return 'oldAge';
+  return 'gift';
+}
 
 function SchemeCard({ scheme, onPress }: { scheme: Scheme; onPress: () => void }) {
   const { t } = useTranslation();
@@ -36,15 +49,17 @@ function SchemeCard({ scheme, onPress }: { scheme: Scheme; onPress: () => void }
       testID={`scheme-${scheme.id}`}
       style={({ pressed }) => ({
         flexDirection: 'row',
+        alignItems: 'center',
         gap: spacing.sm,
         padding: spacing.md,
         marginBottom: spacing.sm,
-        borderRadius: radii.md,
-        borderWidth: 1,
-        borderColor: colors.border,
-        backgroundColor: pressed ? colors.surface : colors.surfaceRaised,
+        borderRadius: radii.lg,
+        backgroundColor: colors.surfaceRaised,
+        opacity: pressed ? 0.88 : 1,
+        ...cardShadow(colors.shadow),
       })}
     >
+      <IconCircle name={schemeIcon(scheme.id)} size={52} />
       <View style={{ flex: 1, gap: spacing.xxs }}>
         <AppText variant="bodyLarge" weight="bold">
           {name}
@@ -52,11 +67,25 @@ function SchemeCard({ scheme, onPress }: { scheme: Scheme; onPress: () => void }
         <AppText variant="body" tone="muted" numberOfLines={2}>
           {covers}
         </AppText>
-        <AppText variant="caption" tone={scheme.placeholder ? 'warning' : 'muted'}>
-          {scheme.placeholder
-            ? t('schemes.placeholderBadge')
-            : t('schemes.lastVerified', { date: formatDate(scheme.lastVerified, t) })}
-        </AppText>
+        {scheme.placeholder ? (
+          <View
+            style={{
+              alignSelf: 'flex-start',
+              paddingHorizontal: spacing.xs,
+              paddingVertical: 2,
+              borderRadius: radii.pill,
+              backgroundColor: colors.warningSoft,
+            }}
+          >
+            <AppText variant="caption" weight="bold" color={colors.onWarningSoft}>
+              {t('schemes.placeholderBadge')}
+            </AppText>
+          </View>
+        ) : (
+          <AppText variant="caption" tone="muted">
+            {t('schemes.lastVerified', { date: formatDate(scheme.lastVerified, t) })}
+          </AppText>
+        )}
       </View>
       <View style={{ justifyContent: 'center' }}>
         <Icon name="chevronRight" color={colors.textMuted} />
@@ -68,7 +97,7 @@ function SchemeCard({ scheme, onPress }: { scheme: Scheme; onPress: () => void }
 export function SchemesScreen() {
   const { t } = useTranslation();
   const navigation = useNavigation<Navigation>();
-  const { spacing } = useTheme();
+  const { colors, spacing } = useTheme();
   const { schemes } = useContent();
 
   return (
@@ -83,14 +112,25 @@ export function SchemesScreen() {
               {schemes.some(s => s.placeholder) ? (
                 <InfoBanner tone="warning" message={t('schemes.placeholderNote')} />
               ) : null}
-              <InfoBanner message={t('schemes.eshramFirst')} icon="idCard" />
-              <Button
-                variant="secondary"
-                icon="idCard"
-                label={t('eshram.open')}
-                onPress={() => navigation.navigate('EshramGuide')}
-                testID="schemes-open-eshram"
-              />
+              <Card tone="soft">
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+                  <IconCircle name="idCard" size={44} background={colors.surfaceRaised} />
+                  <AppText
+                    variant="body"
+                    weight="bold"
+                    color={colors.onAccentSoft}
+                    style={{ flex: 1 }}
+                  >
+                    {t('schemes.eshramFirst')}
+                  </AppText>
+                </View>
+                <Button
+                  icon="arrowRight"
+                  label={t('eshram.open')}
+                  onPress={() => navigation.navigate('EshramGuide')}
+                  testID="schemes-open-eshram"
+                />
+              </Card>
             </View>
           }
           renderItem={({ item }) => (

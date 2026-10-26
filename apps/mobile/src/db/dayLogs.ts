@@ -137,3 +137,85 @@ export async function saveScreenshotLog(
 
   return outcome;
 }
+
+// ---------------------------------------------------------------------------
+// Sync support
+
+/** Logs changed on this phone since the last sync (soft-deleted ones included). */
+export async function listUnsynced(limit: number): Promise<DayLog[]> {
+  const { rows } = await getDatabase().execute(
+    `SELECT ${COLUMNS} FROM day_logs WHERE synced = 0 ORDER BY updated_at LIMIT ?`,
+    [limit],
+  );
+  // Exactly the DayLog fields the API accepts (no local `synced` flag).
+  return (rows as unknown as DayLogRow[]).map(row => {
+    const { id, date, platform, source, amount, updatedAt, deletedAt } = fromRow(row);
+    return { id, date, platform, source, amount, updatedAt, deletedAt };
+  });
+}
+
+/** Marks every log unsynced, e.g. when backup is turned back on or another account signs in. */
+export async function markAllUnsynced(): Promise<void> {
+  await getDatabase().execute('UPDATE day_logs SET synced = 0');
+}
+
+/**
+ * Merges logs from POST /sync into the local database.
+ *
+ * - The server's id is canonical for a (date, platform); a local row with another
+ *   id for the same pair is re-keyed (the server answers a local change that way).
+ * - A change this phone `sent` is settled by the server's echo, unless the worker
+ *   edited it again while the request was in flight. The echo may carry an older
+ *   `updatedAt` when the server clamped a fast phone clock; it still settles it.
+ * - Otherwise last write wins: an unsynced local edit newer than the server's
+ *   copy is kept (and pushed next time); anything else takes the server's copy.
+ */
+export async function applyServerChanges(
+  serverLogs: readonly DayLog[],
+  sent: ReadonlyMap<string, string>,
+): Promise<void> {
+  if (serverLogs.length === 0) {
+    return;
+  }
+  await getDatabase().transaction(async tx => {
+    for (const server of serverLogs) {
+      const { rows } = await tx.execute(
+        `SELECT ${COLUMNS} FROM day_logs WHERE date = ? AND platform = ?`,
+        [server.date, server.platform],
+      );
+      const row = rows[0] as unknown as DayLogRow | undefined;
+
+      if (!row) {
+        await tx.execute(
+          `INSERT INTO day_logs (id, date, platform, source, amount, updated_at, deleted_at, synced)
+           VALUES (?, ?, ?, ?, ?, ?, ?, 1)`,
+          [
+            server.id,
+            server.date,
+            server.platform,
+            server.source,
+            server.amount,
+            server.updatedAt,
+            server.deletedAt,
+          ],
+        );
+        continue;
+      }
+
+      const settledBySend = sent.get(row.id) === row.updated_at;
+      const localWins = row.synced === 0 && !settledBySend && row.updated_at > server.updatedAt;
+
+      if (localWins) {
+        if (row.id !== server.id) {
+          await tx.execute('UPDATE day_logs SET id = ? WHERE id = ?', [server.id, row.id]);
+        }
+        continue;
+      }
+      await tx.execute(
+        `UPDATE day_logs SET id = ?, source = ?, amount = ?, updated_at = ?, deleted_at = ?,
+         synced = 1 WHERE id = ?`,
+        [server.id, server.source, server.amount, server.updatedAt, server.deletedAt, row.id],
+      );
+    }
+  });
+}

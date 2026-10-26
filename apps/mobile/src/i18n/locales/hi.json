@@ -36,7 +36,9 @@
     "verify": "पुष्टि करें",
     "resendIn": "{{seconds}} सेकंड में फिर से भेजें",
     "resend": "कोड फिर से भेजें",
-    "changeNumber": "नंबर बदलें"
+    "changeNumber": "नंबर बदलें",
+    "testMode": "टेस्ट लॉगिन: कोई SMS नहीं आएगा। कोड {{code}} डालें।",
+    "useTestCode": "टेस्ट कोड भरें"
   },
   "platforms": {
     "title": "आप किन ऐप पर काम करते हैं?",
@@ -84,7 +86,8 @@
     "save": "सेव करें",
     "clearDay": "यह दिन हटाएँ",
     "close": "बंद करें",
-    "amountFromScreenshot": "{{platform}}: ₹{{amount}} (स्क्रीनशॉट से)"
+    "amountFromScreenshot": "{{platform}}: ₹{{amount}} (स्क्रीनशॉट से)",
+    "monthCount": "दिन: {{count}}"
   },
   "ocr": {
     "title": "जानकारी जाँचें",
@@ -175,7 +178,8 @@
     "deleteNeedsInternet": "खाता मिटाने के लिए इंटरनेट चाहिए।",
     "deleteFailed": "खाता नहीं मिट पाया। फिर से कोशिश करें।",
     "version": "ऐप वर्ज़न {{version}}",
-    "updateNeeded": "ऐप का नया वर्ज़न चाहिए। Play Store से अपडेट करें।"
+    "updateNeeded": "ऐप का नया वर्ज़न चाहिए। Play Store से अपडेट करें।",
+    "languageVoiceTitle": "भाषा और आवाज़"
   },
   "dates": {
     "months": {
@@ -220,7 +224,8 @@
     "perPlatformTitle": "हर ऐप पर दिन",
     "barA11y": "{{platform}}: {{days}} दिन",
     "recordNote": "यह आपका अपना रिकॉर्ड है, योजना बनाने के लिए। सरकारी गिनती उस डेटा से होती है जो ऐप ई-श्रम को भेजते हैं।",
-    "rule": "नियम: एक साल (अप्रैल–मार्च) में एक ऐप पर {{single}} दिन, या सभी ऐप मिलाकर {{multi}} दिन।"
+    "rule": "नियम: एक साल (अप्रैल–मार्च) में एक ऐप पर {{single}} दिन, या सभी ऐप मिलाकर {{multi}} दिन।",
+    "greeting": "नमस्ते"
   },
   "errors": {
     "network": "इंटरनेट नहीं है। फिर से कोशिश करें।",

@@ -1,10 +1,7 @@
-# Add project specific ProGuard rules here.
-# By default, the flags in this file are appended to flags specified
-# in /usr/local/Cellar/android-sdk/24.3.3/tools/proguard/proguard-android.txt
-# You can edit the include path and order by changing the proguardFiles
-# directive in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# R8 rules for SaddaHaQ release builds. React Native and most libraries ship their
+# own consumer rules; only add rules here for something a release build proves broken.
 
-# Add any project specific keep options here:
+# App-local TurboModule (OCR): React Native calls its methods from C++ over JNI by name,
+# so R8 must not rename or remove them.
+-keep class com.saddahaq.ocr.** { *; }
+-keep class com.saddahaq.specs.** { *; }

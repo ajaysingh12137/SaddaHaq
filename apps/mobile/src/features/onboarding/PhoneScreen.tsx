@@ -2,27 +2,24 @@ import { type NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useMutation } from '@tanstack/react-query';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
 
 import { normalizeIndianMobile } from '@saddahaq/shared';
 
 import { errorMessage } from '../../api/errors';
 import { AppText } from '../../components/AppText';
 import { Button } from '../../components/Button';
-import { Icon } from '../../components/Icon';
+import { InfoBanner } from '../../components/InfoBanner';
 import { Screen } from '../../components/Screen';
 import { ScreenHeader } from '../../components/ScreenHeader';
 import { TextField } from '../../components/TextField';
 import { useOnline } from '../../hooks/useOnline';
 import { type OnboardingStackParamList } from '../../navigation/types';
 import { requestOtp } from '../../services/session';
-import { useTheme } from '../../theme/ThemeProvider';
 
 type Props = NativeStackScreenProps<OnboardingStackParamList, 'Phone'>;
 
 export function PhoneScreen({ navigation }: Props) {
   const { t } = useTranslation();
-  const { colors, spacing } = useTheme();
   const online = useOnline();
   const [input, setInput] = useState('');
   const [touched, setTouched] = useState(false);
@@ -31,7 +28,11 @@ export function PhoneScreen({ navigation }: Props) {
   const send = useMutation({
     mutationFn: (value: string) => requestOtp(value),
     onSuccess: (result, value) =>
-      navigation.navigate('Otp', { phone: value, resendAfterSec: result.resendAfterSec }),
+      navigation.navigate('Otp', {
+        phone: value,
+        resendAfterSec: result.resendAfterSec,
+        testCode: result.testCode,
+      }),
   });
 
   const fieldError = touched && !phone ? t('phone.invalid') : null;
@@ -70,6 +71,7 @@ export function PhoneScreen({ navigation }: Props) {
         subtitle={t('phone.subtitle')}
         onBack={navigation.canGoBack() ? navigation.goBack : undefined}
         backLabel={t('common.back')}
+        icon="phone"
       />
       <TextField
         label={t('phone.label')}
@@ -90,12 +92,7 @@ export function PhoneScreen({ navigation }: Props) {
         }
         testID="phone-input"
       />
-      <View style={{ flexDirection: 'row', gap: spacing.xs, alignItems: 'flex-start' }}>
-        <Icon name="shield" size={20} color={colors.good} />
-        <AppText variant="caption" tone="muted" style={{ flex: 1 }}>
-          {t('phone.privacy')}
-        </AppText>
-      </View>
+      <InfoBanner tone="good" icon="lock" message={t('phone.privacy')} />
     </Screen>
   );
 }

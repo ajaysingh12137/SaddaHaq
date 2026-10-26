@@ -4,6 +4,7 @@ import { authResponseSchema, otpRequestResponseSchema } from '@saddahaq/shared';
 
 import { OtpModel, RefreshTokenModel } from '../models/auth';
 import { UserModel } from '../models/user';
+import { FixedOtpProvider } from '../modules/auth/otp/fixed';
 import { OTP_MAX_ATTEMPTS } from '../modules/auth/service';
 import { REFRESH_TOKEN_TTL_MS } from '../modules/auth/tokens';
 import {
@@ -43,6 +44,16 @@ describe('POST /auth/otp/request', () => {
     expect(serialized).not.toContain(TEST_PHONE);
     expect(stored?.otpHash).not.toContain(otp);
     expect(stored?.otpHash).toMatch(/^[0-9a-f]{64}$/);
+  });
+
+  it('test login: the fixed code works for any number and the app is told so', async () => {
+    h.ctx.otpProvider = new FixedOtpProvider('123456', h.ctx.logger);
+    const res = await requestOtp(OTHER_PHONE).expect(202);
+    expect(otpRequestResponseSchema.parse(res.body).testCode).toBe('123456');
+
+    await verifyOtp('654321', OTHER_PHONE).expect(400);
+    const ok = await verifyOtp('123456', OTHER_PHONE).expect(200);
+    expect(authResponseSchema.parse(ok.body).user.phoneLast4).toBe(OTHER_PHONE.slice(-4));
   });
 
   it('rejects an invalid phone number', async () => {

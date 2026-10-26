@@ -56,6 +56,11 @@ jest.mock('react-native-image-picker', () => ({
 // No native OCR in Jest; tests that need it mock this module with a recognizer.
 jest.mock('../src/specs/NativeTextRecognizer', () => ({ __esModule: true, default: null }));
 
+jest.mock('@sentry/react-native', () => ({
+  init: jest.fn(),
+  close: jest.fn(async () => {}),
+}));
+
 // FlashList needs layout sizes, which Jest has none of.
 require('@shopify/flash-list/jestSetup');
 

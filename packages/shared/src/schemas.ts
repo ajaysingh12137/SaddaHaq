@@ -80,6 +80,11 @@ export const logoutRequestSchema = refreshRequestSchema;
 export const otpRequestResponseSchema = z.object({
   expiresInSec: z.number().int().positive(),
   resendAfterSec: z.number().int().nonnegative(),
+  /** Only in test-login mode (OTP_PROVIDER=fixed): the code that always works. */
+  testCode: z
+    .string()
+    .regex(/^\d{6}$/)
+    .optional(),
 });
 export type OtpRequestResponse = z.infer<typeof otpRequestResponseSchema>;
 

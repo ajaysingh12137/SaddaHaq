@@ -1,10 +1,10 @@
 import { type NativeStackScreenProps } from '@react-navigation/native-stack';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
 
 import { AppText } from '../../components/AppText';
 import { Button } from '../../components/Button';
+import { Card } from '../../components/Card';
 import { EmptyState } from '../../components/EmptyState';
 import { InfoBanner } from '../../components/InfoBanner';
 import { ReadAloudButton } from '../../components/ReadAloudButton';
@@ -22,12 +22,12 @@ type Props = NativeStackScreenProps<MainStackParamList, 'SchemeDetail'>;
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   const { spacing } = useTheme();
   return (
-    <View style={{ gap: spacing.xxs }}>
-      <AppText variant="body" weight="bold">
+    <Card style={{ gap: spacing.xs }}>
+      <AppText variant="body" weight="bold" tone="accent" accessibilityRole="header">
         {title}
       </AppText>
       {children}
-    </View>
+    </Card>
   );
 }
 
@@ -114,9 +114,12 @@ export function SchemeDetailScreen({ navigation, route }: Props) {
           </AppText>
         )}
       </Section>
-      <AppText variant="caption" tone="muted" testID="scheme-last-verified">
-        {t('schemes.lastVerified', { date: formatDate(scheme.lastVerified, t) })}
-      </AppText>
+      {/* Placeholder text was only written, never checked: no "last checked" date. */}
+      {scheme.placeholder ? null : (
+        <AppText variant="caption" tone="muted" testID="scheme-last-verified">
+          {t('schemes.lastVerified', { date: formatDate(scheme.lastVerified, t) })}
+        </AppText>
+      )}
     </Screen>
   );
 }

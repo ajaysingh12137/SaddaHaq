@@ -22,6 +22,10 @@ const TEXT_PAIRS: Array<[keyof ColorTokens, keyof ColorTokens]> = [
   ['onWarning', 'warning'],
   ['danger', 'background'],
   ['danger', 'surfaceRaised'],
+  ['onGoodSoft', 'goodSoft'],
+  ['onWarningSoft', 'warningSoft'],
+  ['accent', 'accentSoft'],
+  ['textMuted', 'accentSoft'],
 ];
 
 describe.each([

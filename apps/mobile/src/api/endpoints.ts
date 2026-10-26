@@ -1,8 +1,10 @@
 import {
+  type SyncRequest,
   type UserPatch,
   authResponseSchema,
   contentResponseSchema,
   otpRequestResponseSchema,
+  syncResponseSchema,
   userSchema,
 } from '@saddahaq/shared';
 
@@ -28,6 +30,8 @@ export function createEndpoints(client: ApiClient) {
     getMe: () => client.get('/me', { schema: userSchema }),
     patchMe: (patch: UserPatch) => client.patch('/me', { body: patch, schema: userSchema }),
     deleteMe: () => client.delete('/me'),
+    sync: (request: SyncRequest) =>
+      client.post('/sync', { body: request, schema: syncResponseSchema }),
     /** Public. Resolves `undefined` (304) when nothing changed since `since`. */
     getContent: (since: string | null) =>
       client.get(since ? `/content?since=${encodeURIComponent(since)}` : '/content', {

@@ -3,6 +3,7 @@ import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 're
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useTheme } from '../theme/ThemeProvider';
+import { cardShadow } from '../theme/tokens';
 import { OfflineBanner } from './OfflineBanner';
 
 /**
@@ -21,7 +22,7 @@ export function Screen({
   testID?: string;
 }) {
   const { colors, spacing } = useTheme();
-  const content = { padding: spacing.md, gap: spacing.md };
+  const content = { padding: spacing.md, paddingBottom: spacing.lg, gap: spacing.md };
 
   return (
     <SafeAreaView
@@ -46,9 +47,10 @@ export function Screen({
             style={{
               padding: spacing.md,
               gap: spacing.xs,
-              borderTopWidth: StyleSheet.hairlineWidth,
-              borderTopColor: colors.border,
-              backgroundColor: colors.background,
+              borderTopLeftRadius: 24,
+              borderTopRightRadius: 24,
+              backgroundColor: colors.surfaceRaised,
+              ...cardShadow(colors.shadow, 2),
             }}
           >
             {footer}

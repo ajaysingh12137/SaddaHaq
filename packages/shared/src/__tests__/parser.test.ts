@@ -19,6 +19,9 @@ describe('parseEarningsText — fixtures', () => {
     ['instamart-single-amount', { platform: 'swiggy', date: '2026-10-13', amount: 123456.75 }],
     ['ambiguous-amounts', { platform: 'ola', date: '2026-10-14', amount: null }],
     ['garbage', { platform: null, date: null, amount: null }],
+    // Real ML Kit output (Latin, then Devanagari) from a synthetic screenshot on a
+    // phone: the large "₹" was read as "2", so only the incentive kept its ₹.
+    ['zomato-rupee-misread', { platform: 'zomato', date: '2025-10-21', amount: null }],
   ])('%s', (name, expected) => {
     expect(parseEarningsText(fixture(name), { today: TODAY })).toEqual(expected);
   });
@@ -101,6 +104,13 @@ describe('detectAmount', () => {
 
   it('accepts repeated identical amounts without a keyword', () => {
     expect(detectAmount('₹250\nPaid ₹250')).toBe(250);
+  });
+
+  it('never offers an incentive, tip or bonus as the only amount', () => {
+    expect(detectAmount('Incentives ₹200')).toBeNull();
+    expect(detectAmount('Tip ₹30\nTip ₹30')).toBeNull();
+    expect(detectAmount('बोनस ₹50')).toBeNull();
+    expect(detectAmount("Today's earnings ₹900\nIncentives ₹200")).toBe(900);
   });
 
   it('gives up on several different amounts without a keyword', () => {

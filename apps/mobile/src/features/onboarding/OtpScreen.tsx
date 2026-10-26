@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import { errorMessage } from '../../api/errors';
 import { Button } from '../../components/Button';
+import { InfoBanner } from '../../components/InfoBanner';
 import { Screen } from '../../components/Screen';
 import { ScreenHeader } from '../../components/ScreenHeader';
 import { TextField } from '../../components/TextField';
@@ -27,7 +28,7 @@ function useCountdown(seconds: number) {
 }
 
 export function OtpScreen({ navigation, route }: Props) {
-  const { phone, resendAfterSec } = route.params;
+  const { phone, resendAfterSec, testCode } = route.params;
   const { t } = useTranslation();
   const online = useOnline();
   const [code, setCode] = useState('');
@@ -83,6 +84,7 @@ export function OtpScreen({ navigation, route }: Props) {
         subtitle={t('otp.subtitle', { phone })}
         onBack={navigation.goBack}
         backLabel={t('otp.changeNumber')}
+        icon="phoneMessage"
       />
       <TextField
         label={t('otp.label')}
@@ -96,6 +98,17 @@ export function OtpScreen({ navigation, route }: Props) {
         error={message ? t(message.key, 'values' in message ? message.values : {}) : null}
         testID="otp-input"
       />
+      {testCode ? (
+        <>
+          <InfoBanner message={t('otp.testMode', { code: testCode })} testID="otp-test-mode" />
+          <Button
+            variant="secondary"
+            label={t('otp.useTestCode')}
+            onPress={() => onChange(testCode)}
+            testID="otp-use-test-code"
+          />
+        </>
+      ) : null}
     </Screen>
   );
 }

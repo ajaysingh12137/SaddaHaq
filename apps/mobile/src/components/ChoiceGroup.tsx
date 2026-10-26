@@ -2,7 +2,7 @@ import React from 'react';
 import { Pressable, View } from 'react-native';
 
 import { useTheme } from '../theme/ThemeProvider';
-import { TOUCH_TARGET } from '../theme/tokens';
+import { TOUCH_TARGET, cardShadow } from '../theme/tokens';
 import { AppText } from './AppText';
 
 export interface Choice<T extends string | number> {
@@ -30,7 +30,16 @@ export function ChoiceGroup<T extends string | number>({
       <AppText variant="body" weight="bold">
         {label}
       </AppText>
-      <View style={{ flexDirection: 'row', gap: spacing.xs }}>
+      {/* Segmented control: the chosen option is a raised white pill on a soft track. */}
+      <View
+        style={{
+          flexDirection: 'row',
+          gap: spacing.xxs,
+          padding: spacing.xxs,
+          borderRadius: radii.lg,
+          backgroundColor: colors.surface,
+        }}
+      >
         {choices.map(choice => {
           const selected = choice.value === value;
           return (
@@ -43,22 +52,21 @@ export function ChoiceGroup<T extends string | number>({
               testID={testIDPrefix ? `${testIDPrefix}-${choice.value}` : undefined}
               style={({ pressed }) => ({
                 flex: 1,
-                minHeight: TOUCH_TARGET + 8,
+                minHeight: TOUCH_TARGET + 4,
                 alignItems: 'center',
                 justifyContent: 'center',
                 paddingHorizontal: spacing.xs,
                 borderRadius: radii.md,
-                borderWidth: 2,
-                borderColor: selected ? colors.accent : colors.border,
-                backgroundColor: selected ? colors.accentSoft : colors.surfaceRaised,
+                backgroundColor: selected ? colors.surfaceRaised : 'transparent',
                 opacity: pressed ? 0.85 : 1,
+                ...(selected ? cardShadow(colors.shadow) : null),
               })}
             >
               <AppText
                 variant="body"
                 weight="bold"
                 center
-                color={selected ? colors.onAccentSoft : colors.text}
+                color={selected ? colors.accent : colors.textMuted}
               >
                 {choice.label}
               </AppText>

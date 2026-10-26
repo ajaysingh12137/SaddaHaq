@@ -104,6 +104,33 @@ const AMOUNT_KEYWORDS = [
   'कुल',
 ] as const;
 
+/**
+ * Amounts that are part of the day but not its earnings. A line with one of
+ * these is never used by the "only one amount on screen" fallback: on a real
+ * phone ML Kit misread a large "₹1,245.50" as "21,245.50", which left the
+ * incentive as the only ₹ amount, and it must not be offered as the earnings.
+ */
+const NON_EARNINGS_KEYWORDS = [
+  'incentive',
+  'incentives',
+  'bonus',
+  'tip',
+  'tips',
+  'toll',
+  'tolls',
+  'cash collected',
+  'deduction',
+  'deductions',
+  'penalty',
+  'प्रोत्साहन',
+  'बोनस',
+] as const;
+
+function isNonEarningsLine(line: string): boolean {
+  const lower = line.toLowerCase();
+  return NON_EARNINGS_KEYWORDS.some(k => keywordPositions(lower, k).length > 0);
+}
+
 function amountsInLine(line: string): number[] {
   return Array.from(line.matchAll(AMOUNT_RE), m => Number((m[1] as string).replace(/,/g, '')));
 }
@@ -128,7 +155,9 @@ export function detectAmount(text: string): number | null {
     if (amounts.length === 0) {
       continue;
     }
-    all.push(...amounts);
+    if (!isNonEarningsLine(line)) {
+      all.push(...amounts);
+    }
     // A label is usually on the same line, or just above/below the value.
     const neighbours = [
       { rank: bestKeywordRank(line), distance: 0 },

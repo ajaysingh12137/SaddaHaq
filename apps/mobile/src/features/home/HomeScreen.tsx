@@ -14,13 +14,14 @@ import {
 import { AppText } from '../../components/AppText';
 import { Button } from '../../components/Button';
 import { EmptyState } from '../../components/EmptyState';
-import { Icon } from '../../components/Icon';
+import { Card } from '../../components/Card';
+import { Icon, type IconName } from '../../components/Icon';
+import { IconCircle } from '../../components/IconCircle';
 import { InfoBanner } from '../../components/InfoBanner';
 import { PlatformBadge, usePlatformName } from '../../components/PlatformTile';
 import { ProgressRing } from '../../components/ProgressRing';
 import { ReadAloudButton } from '../../components/ReadAloudButton';
 import { Screen } from '../../components/Screen';
-import { ScreenHeader } from '../../components/ScreenHeader';
 import { APP_VERSION } from '../../config/version';
 import { useToday } from '../../hooks/useToday';
 import { type MainStackParamList } from '../../navigation/types';
@@ -81,7 +82,7 @@ function PlatformBars({
   );
 
   return (
-    <View style={{ gap: spacing.sm }}>
+    <Card style={{ gap: spacing.md }}>
       <AppText variant="title">{t('home.perPlatformTitle')}</AppText>
       {entries.map(([id, days]) => (
         <View
@@ -91,20 +92,20 @@ function PlatformBars({
           style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}
           testID={`bar-${id}`}
         >
-          <PlatformBadge id={id} size={36} />
-          <View style={{ flex: 1, gap: spacing.xxs }}>
+          <PlatformBadge id={id} size={40} />
+          <View style={{ flex: 1, gap: spacing.xs }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
               <AppText variant="body" weight="bold">
                 {platformName(id)}
               </AppText>
-              <AppText variant="body">
+              <AppText variant="body" tone="muted">
                 {days}/{target}
               </AppText>
             </View>
             <View style={{ height: 10, borderRadius: radii.pill, backgroundColor: colors.track }}>
               <View
                 style={{
-                  width: `${Math.min(100, (days / target) * 100)}%`,
+                  width: `${Math.max(4, Math.min(100, (days / target) * 100))}%`,
                   height: 10,
                   borderRadius: radii.pill,
                   backgroundColor: PLATFORMS[id].color,
@@ -114,41 +115,53 @@ function PlatformBars({
           </View>
         </View>
       ))}
-    </View>
+    </Card>
+  );
+}
+
+/** A small figure with its label: "all apps together" and "days left". */
+function StatTile({ icon, text, testID }: { icon: IconName; text: string; testID: string }) {
+  const { spacing } = useTheme();
+  return (
+    <Card style={{ flex: 1, gap: spacing.xs }}>
+      <IconCircle name={icon} size={40} />
+      <AppText variant="body" weight="bold" testID={testID}>
+        {text}
+      </AppText>
+    </Card>
   );
 }
 
 /** Shown until the worker says they are registered: e-Shram is the first step to any benefit. */
 function EshramCard({ onOpen }: { onOpen: () => void }) {
   const { t } = useTranslation();
-  const { colors, radii, spacing } = useTheme();
+  const { colors, spacing } = useTheme();
   return (
-    <View
-      testID="home-eshram-card"
-      style={{
-        gap: spacing.sm,
-        padding: spacing.md,
-        borderRadius: radii.md,
-        backgroundColor: colors.accentSoft,
-      }}
-    >
+    <Card testID="home-eshram-card">
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-        <Icon name="idCard" color={colors.onAccentSoft} />
-        <AppText variant="bodyLarge" weight="bold" color={colors.onAccentSoft} style={{ flex: 1 }}>
-          {t('eshram.cardTitle')}
-        </AppText>
+        <IconCircle
+          name="idCard"
+          size={48}
+          color={colors.warning}
+          background={colors.warningSoft}
+        />
+        <View style={{ flex: 1, gap: spacing.xxs }}>
+          <AppText variant="bodyLarge" weight="bold">
+            {t('eshram.cardTitle')}
+          </AppText>
+          <AppText variant="caption" tone="muted">
+            {t('eshram.cardBody')}
+          </AppText>
+        </View>
       </View>
-      <AppText variant="body" color={colors.onAccentSoft}>
-        {t('eshram.cardBody')}
-      </AppText>
       <Button
-        variant="ghost"
+        variant="secondary"
         icon="arrowRight"
         label={t('eshram.open')}
         onPress={onOpen}
         testID="home-open-eshram"
       />
-    </View>
+    </Card>
   );
 }
 
@@ -168,6 +181,8 @@ export function HomeScreen() {
   const { status, secondary, ringLabel, primary } = useMeterText(result);
   const daysLeft = t('home.daysLeft', { count: result.daysLeftInFy });
   const likely = result.likelyEligible;
+  const heroColor = likely ? colors.good : colors.accent;
+  const onHero = likely ? colors.onGood : colors.onAccent;
 
   const script = [
     status,
@@ -189,73 +204,108 @@ export function HomeScreen() {
         />
       }
     >
-      <ScreenHeader
-        title={t('home.title')}
-        subtitle={t('home.fyLabel', { label: result.fy.label })}
-      />
+      <View style={{ gap: spacing.xxs, paddingTop: spacing.xs }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
+          <Icon name="wave" size={22} color={colors.warning} />
+          <AppText variant="body" tone="muted">
+            {t('home.greeting')}
+          </AppText>
+        </View>
+        <AppText variant="heading">{t('home.title')}</AppText>
+        <AppText variant="caption" tone="muted">
+          {t('home.fyLabel', { label: result.fy.label })}
+        </AppText>
+      </View>
       {updateNeeded ? <InfoBanner tone="warning" message={t('settings.updateNeeded')} /> : null}
-      {registered ? null : <EshramCard onOpen={() => navigation.navigate('EshramGuide')} />}
 
       {result.status === 'no_logs' ? (
-        <EmptyState icon="calendar" message={t('home.empty')} />
+        <Card>
+          <EmptyState icon="calendarPlus" message={t('home.empty')} />
+        </Card>
       ) : (
         <>
-          <View style={{ alignItems: 'center', gap: spacing.sm }}>
+          <Card
+            tone="accent"
+            style={{
+              alignItems: 'center',
+              gap: spacing.md,
+              paddingVertical: spacing.lg,
+              backgroundColor: heroColor,
+            }}
+          >
             <ProgressRing
               progress={primary.progress}
-              color={likely ? colors.good : colors.accent}
+              size={200}
+              color={onHero}
+              trackColor="rgba(255, 255, 255, 0.25)"
               accessibilityLabel={t('home.ringA11y', {
                 days: primary.days,
                 target: primary.target,
                 label: ringLabel,
               })}
             >
-              <AppText variant="display" testID="meter-count">
+              <AppText variant="display" color={onHero} testID="meter-count">
                 {primary.days}/{primary.target}
               </AppText>
-              <AppText variant="caption" tone="muted" center style={{ maxWidth: 150 }}>
+              <AppText variant="caption" center color={onHero} style={{ maxWidth: 140 }}>
                 {ringLabel}
               </AppText>
             </ProgressRing>
             <View
               style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: spacing.xs,
                 paddingHorizontal: spacing.md,
                 paddingVertical: spacing.xs,
-                borderRadius: radii.md,
-                backgroundColor: likely ? colors.good : colors.accentSoft,
+                borderRadius: radii.pill,
+                backgroundColor: colors.surfaceRaised,
               }}
             >
+              <Icon
+                name={likely ? 'checkCircle' : 'target'}
+                filled={likely}
+                size={20}
+                color={likely ? colors.good : colors.accent}
+              />
               <AppText
-                variant="bodyLarge"
+                variant="body"
                 weight="bold"
                 center
-                color={likely ? colors.onGood : colors.onAccentSoft}
+                color={likely ? colors.good : colors.onAccentSoft}
                 testID="meter-status"
                 accessibilityLiveRegion="polite"
+                style={{ flexShrink: 1 }}
               >
                 {status}
               </AppText>
             </View>
-            <AppText variant="body" tone="muted" center testID="meter-secondary">
-              {secondary}
-            </AppText>
-            <AppText variant="body" center testID="meter-days-left">
-              {daysLeft}
-            </AppText>
+          </Card>
+          <View style={{ flexDirection: 'row', gap: spacing.sm }}>
+            <StatTile icon="chart" text={secondary} testID="meter-secondary" />
+            <StatTile icon="clock" text={daysLeft} testID="meter-days-left" />
           </View>
           <ReadAloudButton text={script} testID="home-read-aloud" />
-          <PlatformBars perPlatform={result.perPlatform} target={result.single.target} />
         </>
       )}
 
-      <View style={{ gap: spacing.xs }}>
-        <AppText variant="caption" tone="muted">
-          {t('home.rule', { single: config.singleThreshold, multi: config.multiThreshold })}
-        </AppText>
-        <AppText variant="caption" tone="muted" testID="meter-record-note">
+      {registered ? null : <EshramCard onOpen={() => navigation.navigate('EshramGuide')} />}
+
+      {result.status === 'no_logs' ? null : (
+        <PlatformBars perPlatform={result.perPlatform} target={result.single.target} />
+      )}
+
+      <Card tone="soft" style={{ gap: spacing.xs }}>
+        <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.xs }}>
+          <Icon name="info" size={20} color={colors.onAccentSoft} />
+          <AppText variant="caption" weight="bold" color={colors.onAccentSoft} style={{ flex: 1 }}>
+            {t('home.rule', { single: config.singleThreshold, multi: config.multiThreshold })}
+          </AppText>
+        </View>
+        <AppText variant="caption" color={colors.onAccentSoft} testID="meter-record-note">
           {t('home.recordNote')}
         </AppText>
-      </View>
+      </Card>
 
       <LogDaySheet date={logToday ? today : null} onClose={() => setLogToday(false)} />
     </Screen>

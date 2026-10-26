@@ -2,11 +2,11 @@ import React from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 
 import { useTheme } from '../theme/ThemeProvider';
-import { TOUCH_TARGET } from '../theme/tokens';
+import { TOUCH_TARGET, cardShadow } from '../theme/tokens';
 import { AppText } from './AppText';
 import { Icon, type IconName } from './Icon';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 
 export interface ButtonProps {
   label: string;
@@ -40,6 +40,7 @@ export function Button({
     primary: { bg: colors.accent, fg: colors.onAccent, border: colors.accent },
     secondary: { bg: colors.accentSoft, fg: colors.onAccentSoft, border: colors.accentSoft },
     ghost: { bg: 'transparent', fg: colors.accent, border: 'transparent' },
+    danger: { bg: colors.surfaceRaised, fg: colors.danger, border: colors.danger },
   }[variant];
 
   return (
@@ -56,17 +57,19 @@ export function Button({
         {
           backgroundColor: palette.bg,
           borderColor: palette.border,
-          borderRadius: radii.md,
+          borderRadius: radii.lg,
           paddingHorizontal: spacing.lg,
           opacity: inactive ? 0.5 : pressed ? 0.85 : 1,
+          transform: [{ scale: pressed && !inactive ? 0.98 : 1 }],
         },
+        variant === 'primary' && !inactive ? cardShadow(colors.accent, 1) : null,
       ]}
     >
-      <View style={[styles.row, { gap: spacing.xs }]}>
+      <View style={[styles.row, { gap: spacing.xs + 2 }]}>
         {loading ? (
           <ActivityIndicator color={palette.fg} />
         ) : icon ? (
-          <Icon name={icon} color={palette.fg} />
+          <Icon name={icon} color={palette.fg} size={22} />
         ) : null}
         <AppText variant="bodyLarge" weight="bold" color={palette.fg}>
           {label}
@@ -78,8 +81,8 @@ export function Button({
 
 const styles = StyleSheet.create({
   base: {
-    minHeight: TOUCH_TARGET + 8,
-    borderWidth: 1,
+    minHeight: TOUCH_TARGET + 10,
+    borderWidth: 1.5,
     justifyContent: 'center',
   },
   row: {

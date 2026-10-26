@@ -1,4 +1,4 @@
-import NetInfo from '@react-native-community/netinfo';
+import NetInfo, { type NetInfoState } from '@react-native-community/netinfo';
 import {
   QueryClient,
   QueryClientProvider,
@@ -16,7 +16,10 @@ import { i18next } from './i18n';
 import en from './i18n/locales/en.json';
 import hi from './i18n/locales/hi.json';
 import { RootNavigator } from './navigation/RootNavigator';
+import { startCrashReporting } from './services/monitoring';
 import { bootstrap, flushProfile } from './services/session';
+import { requestSync } from './services/sync';
+import { useSession } from './state/sessionStore';
 import { ThemeProvider, useTheme } from './theme/ThemeProvider';
 
 // TanStack Query follows real connectivity and app focus.
@@ -36,6 +39,19 @@ export const queryClient = new QueryClient({
     mutations: { retry: 0 },
   },
 });
+
+/**
+ * Pushes queued profile changes and unsynced logs when the connection comes back.
+ * NetInfo calls this as soon as it is subscribed, which is before bootstrap has
+ * opened the database, so nothing happens while booting (bootstrap syncs itself).
+ */
+export function handleConnectivityChange(state: Pick<NetInfoState, 'isConnected'>): void {
+  if (!state.isConnected || useSession.getState().status === 'booting') {
+    return;
+  }
+  void flushProfile();
+  requestSync();
+}
 
 function StatusBarForTheme() {
   const { dark } = useTheme();
@@ -76,13 +92,12 @@ export default function App() {
 
   useEffect(() => {
     start();
-    // Push queued profile changes when the connection comes back.
-    const unsubscribe = NetInfo.addEventListener(state => {
-      if (state.isConnected) {
-        void flushProfile();
-      }
-    });
-    return unsubscribe;
+    const stopCrashReporting = startCrashReporting();
+    const unsubscribe = NetInfo.addEventListener(handleConnectivityChange);
+    return () => {
+      unsubscribe();
+      stopCrashReporting();
+    };
   }, []);
 
   return (

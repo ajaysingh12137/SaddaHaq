@@ -8,6 +8,7 @@ import { AppText } from '../../components/AppText';
 import { usePlatformName } from '../../components/PlatformTile';
 import { formatDate, formatMonth, weekdayOf, weekdayShort } from '../../lib/dates';
 import { useTheme } from '../../theme/ThemeProvider';
+import { cardShadow } from '../../theme/tokens';
 
 const CELL_HEIGHT = 56;
 const MAX_DOTS = 3;
@@ -43,12 +44,50 @@ export const MonthCalendar = memo(function MonthCalendarView({
   ];
   while (cells.length % 7 !== 0) cells.push(null);
   const weeks = Array.from({ length: cells.length / 7 }, (_, w) => cells.slice(w * 7, w * 7 + 7));
+  const daysLogged = cells.filter(
+    day => day !== null && (byDate.get(toISODate(year, month, day))?.length ?? 0) > 0,
+  ).length;
 
   return (
-    <View style={{ gap: spacing.xs, paddingBottom: spacing.lg }}>
-      <AppText variant="title" accessibilityRole="header">
-        {formatMonth(year, month, t)}
-      </AppText>
+    // Card padding stays at 4 dp so seven day cells keep ≥ 48 dp on a 360 dp phone.
+    <View
+      style={{
+        gap: spacing.xs,
+        marginBottom: spacing.md,
+        paddingHorizontal: spacing.xxs,
+        paddingTop: spacing.md,
+        paddingBottom: spacing.sm,
+        borderRadius: radii.lg,
+        backgroundColor: colors.surfaceRaised,
+        ...cardShadow(colors.shadow),
+      }}
+    >
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingHorizontal: spacing.sm,
+        }}
+      >
+        <AppText variant="title" accessibilityRole="header">
+          {formatMonth(year, month, t)}
+        </AppText>
+        {daysLogged > 0 ? (
+          <View
+            style={{
+              paddingHorizontal: spacing.sm,
+              paddingVertical: spacing.xxs,
+              borderRadius: radii.pill,
+              backgroundColor: colors.accentSoft,
+            }}
+          >
+            <AppText variant="caption" weight="bold" color={colors.onAccentSoft}>
+              {t('log.monthCount', { count: daysLogged })}
+            </AppText>
+          </View>
+        ) : null}
+      </View>
       <View style={{ flexDirection: 'row' }} importantForAccessibility="no-hide-descendants">
         {WEEKDAYS.map(d => (
           <AppText key={d} variant="caption" tone="muted" center style={{ flex: 1 }}>
@@ -90,9 +129,10 @@ export const MonthCalendar = memo(function MonthCalendarView({
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: 2,
-                  borderRadius: radii.sm,
+                  borderRadius: radii.md,
                   borderWidth: isToday ? 2 : 0,
                   borderColor: colors.accent,
+                  opacity: loggable ? 1 : 0.45,
                   backgroundColor:
                     platforms.length > 0 ? colors.accentSoft : pressed ? colors.surface : undefined,
                 })}

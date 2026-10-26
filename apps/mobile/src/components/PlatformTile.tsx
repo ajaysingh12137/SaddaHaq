@@ -5,6 +5,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { PLATFORMS, type PlatformId } from '@saddahaq/shared';
 
 import { useTheme } from '../theme/ThemeProvider';
+import { cardShadow } from '../theme/tokens';
 import { AppText } from './AppText';
 import { Icon } from './Icon';
 
@@ -66,13 +67,15 @@ export function PlatformTile({
       style={({ pressed }) => [
         styles.tile,
         {
-          borderRadius: radii.md,
+          borderRadius: radii.lg,
           padding: spacing.sm,
           gap: spacing.xs,
-          borderColor: selected ? colors.accent : colors.border,
+          borderColor: selected ? colors.accent : colors.surfaceRaised,
           backgroundColor: selected ? colors.accentSoft : colors.surfaceRaised,
           opacity: pressed ? 0.85 : 1,
+          transform: [{ scale: pressed ? 0.97 : 1 }],
         },
+        cardShadow(colors.shadow),
       ]}
     >
       <PlatformBadge id={id} />

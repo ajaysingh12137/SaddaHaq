@@ -14,6 +14,7 @@ import { loadLogs, resetLogsStore } from '../state/logsStore';
 import { resetSessionStore, setSession, useSession } from '../state/sessionStore';
 import { api, onAuthLost, tokenStore } from './api';
 import { loadCachedContent } from './content';
+import { requestSync, resetSyncState } from './sync';
 
 const KEYS = {
   language: 'settings.language',
@@ -50,6 +51,7 @@ export async function bootstrap(): Promise<void> {
 
   if (signedIn) {
     void flushProfile();
+    requestSync();
   }
 }
 
@@ -77,6 +79,8 @@ export async function signIn(phone: string, otp: string): Promise<User> {
   await tokenStore.set({ accessToken: result.accessToken, refreshToken: result.refreshToken });
   await kvSet(KEYS.user, result.user);
   await kvSet(KEYS.onboarded, false);
+  // Whatever this phone holds is sent in full to this account's backup (if turned on).
+  await resetSyncState();
   setSession({ user: result.user, status: 'onboarding' });
   return result.user;
 }
@@ -100,6 +104,7 @@ export async function completeOnboarding(choices: OnboardingChoices): Promise<vo
   });
   await kvSet(KEYS.onboarded, true);
   setSession({ status: 'ready' });
+  requestSync();
 }
 
 /** Applies a profile change locally at once and queues it for the server. */
@@ -198,7 +203,13 @@ export async function setConsents(consents: {
   backup: boolean;
   analytics: boolean;
 }): Promise<void> {
+  const wasBackedUp = useSession.getState().user?.consents.backup === true;
   await queueProfilePatch({ consents: { ...consents, acceptedAt: new Date().toISOString() } });
+  if (consents.backup && !wasBackedUp) {
+    // The server deleted its copy when backup was turned off: send everything again.
+    await resetSyncState();
+    requestSync();
+  }
 }
 
 /**

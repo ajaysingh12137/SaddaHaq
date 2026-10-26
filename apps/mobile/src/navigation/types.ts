@@ -3,7 +3,8 @@ import { type PlatformId } from '@saddahaq/shared';
 export type OnboardingStackParamList = {
   Language: undefined;
   Phone: undefined;
-  Otp: { phone: string; resendAfterSec: number };
+  /** testCode: set only when the server runs the fixed test login. */
+  Otp: { phone: string; resendAfterSec: number; testCode?: string };
   Platforms: undefined;
   Consent: { platforms: PlatformId[] };
 };

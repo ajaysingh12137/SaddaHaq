@@ -14,7 +14,9 @@ npm run dev          # API on http://localhost:4000
 With `MONGO_URI` unset, `npm run dev` starts an **in-memory MongoDB** and seeds
 placeholder content from `packages/shared/src/content/placeholder.ts` automatically
 (data is lost on stop). The app bundles the same content as its offline fallback. OTPs are printed to the
-server log by the console provider (`devOtp: "123456"`).
+server log by the console provider (`devOtp: "123456"`). With `OTP_PROVIDER=fixed` (test login)
+every number signs in with `FIXED_OTP_CODE` (default `123456`), no SMS is sent, and the app
+shows the code with a one-tap fill. Production refuses it unless `ALLOW_TEST_LOGIN=true`.
 
 To use a real database, copy `apps/api/.env.example` to `apps/api/.env`, set
 `MONGO_URI`, then `npm run seed`.
@@ -24,7 +26,7 @@ To use a real database, copy `apps/api/.env.example` to `apps/api/.env`, set
 | Method | Path                | Auth   | Notes |
 | ------ | ------------------- | ------ | ----- |
 | GET    | `/health`           | –      | 200 `{status, db, version}`; 503 if the DB is down |
-| POST   | `/auth/otp/request` | –      | `{phone}` → 202 `{expiresInSec, resendAfterSec}`. Limits: 10/15 min per IP, 5/15 min per number, 60 s resend cooldown |
+| POST   | `/auth/otp/request` | –      | `{phone}` → 202 `{expiresInSec, resendAfterSec, testCode?}` (`testCode` only in test-login mode). Limits: 10/15 min per IP, 5/15 min per number, 60 s resend cooldown |
 | POST   | `/auth/otp/verify`  | –      | `{phone, otp}` → `{accessToken, refreshToken, user}`. 5 wrong attempts lock the code |
 | POST   | `/auth/refresh`     | –      | `{refreshToken}` → new pair; old token revoked. Reusing a revoked token revokes all sessions |
 | POST   | `/auth/logout`      | –      | `{refreshToken}` → 204 |
@@ -65,5 +67,7 @@ stored as SHA-256, rotated on every use.
 
 - Rate limits are kept in process memory: running several API instances needs a
   shared store (e.g. Redis).
-- Tests run Jest with `--experimental-vm-modules` to work around an upstream
-  MongoDB driver regression (≥ 7.6) under Jest, tracked as NODE-7832. Remove once fixed.
+- The MongoDB driver (≥ 7.6) loads `os` with a dynamic `import()`, which Jest's
+  CommonJS sandbox rejects (tracked upstream as NODE-7832). `npm test` runs Jest with
+  `--experimental-vm-modules`, and the test helper also passes `runtimeAdapters: { os }`
+  so plain `npx jest` and IDE runners work. Remove both once fixed upstream.

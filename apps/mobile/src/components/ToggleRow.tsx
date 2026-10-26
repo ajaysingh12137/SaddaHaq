@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, Switch, View } from 'react-native';
 
 import { useTheme } from '../theme/ThemeProvider';
-import { TOUCH_TARGET } from '../theme/tokens';
+import { TOUCH_TARGET, cardShadow } from '../theme/tokens';
 import { AppText } from './AppText';
-import { Icon, type IconName } from './Icon';
+import { type IconName } from './Icon';
+import { IconCircle } from './IconCircle';
 
 /** The whole row is the touch target, not just the small switch. */
 export function ToggleRow({
@@ -40,11 +41,12 @@ export function ToggleRow({
         gap: spacing.sm,
         minHeight: TOUCH_TARGET + 16,
         padding: spacing.md,
-        borderRadius: radii.md,
-        backgroundColor: colors.surface,
+        borderRadius: radii.lg,
+        backgroundColor: colors.surfaceRaised,
+        ...cardShadow(colors.shadow),
       }}
     >
-      {icon ? <Icon name={icon} color={colors.accent} /> : null}
+      {icon ? <IconCircle name={icon} size={40} /> : null}
       <View style={{ flex: 1, gap: spacing.xxs }}>
         <AppText variant="body" weight="bold">
           {title}
@@ -58,7 +60,7 @@ export function ToggleRow({
       <Switch
         value={value}
         onValueChange={onChange}
-        trackColor={{ true: colors.accent, false: colors.border }}
+        trackColor={{ true: colors.accent, false: colors.track }}
         thumbColor={colors.surfaceRaised}
         accessibilityElementsHidden
         importantForAccessibility="no-hide-descendants"

@@ -9,11 +9,13 @@ import {
   saveScreenshotLog,
   setPlatformsForDate,
 } from '../db/dayLogs';
+import { requestSync } from '../services/sync';
 
 /**
  * Live day logs held in memory for the calendar and the eligibility meter.
  * A worker logs at most a few rows a day, so years of history stay small.
- * Writes go to the database first, then the store reloads from it.
+ * Writes go to the database first, then the store reloads from it and a
+ * background sync is requested (it does nothing unless backup is on).
  */
 export interface LogsState {
   logs: StoredDayLog[];
@@ -31,11 +33,13 @@ export async function loadLogs(): Promise<void> {
 export async function logDay(date: ISODate, platforms: readonly PlatformId[]): Promise<void> {
   await setPlatformsForDate(date, platforms);
   await loadLogs();
+  requestSync();
 }
 
 export async function logFromScreenshot(input: ScreenshotLogInput) {
   const outcome = await saveScreenshotLog(input);
   await loadLogs();
+  requestSync();
   return outcome;
 }
 

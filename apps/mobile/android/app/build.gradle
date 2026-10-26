@@ -45,8 +45,9 @@ react {
     // extraPackagerArgs = []
 
     /* Hermes Commands */
-    //   The hermes compiler command to run. By default it is 'hermesc'
-    // hermesCommand = "$rootDir/my-custom-hermesc/bin/hermesc"
+    //   The hermes compiler command to run. Hoisted to the monorepo root, and shipped in
+    //   the hermes-compiler package; %OS-BIN% picks the binary for Windows, macOS or Linux.
+    hermesCommand = "$rootDir/../../../node_modules/hermes-compiler/hermesc/%OS-BIN%/hermesc"
     //
     //   The list of flags to pass to the Hermes compiler. By default is "-O", "-output-source-map"
     // hermesFlags = ["-O", "-output-source-map"]
@@ -55,10 +56,40 @@ react {
     autolinkLibrariesWithApp()
 }
 
+import groovy.json.JsonSlurper
+
+/** R8 code and resource shrinking for release builds (part of the ~25 MB size budget). */
+def enableProguardInReleaseBuilds = true
+
 /**
- * Set this to true to Run Proguard on Release builds to minify the Java bytecode.
+ * One APK per CPU architecture for sideloaded beta builds:
+ *   ./gradlew assembleRelease -PsplitApks
+ * Off by default because AGP refuses ABI splits in the same run as bundleRelease
+ * (https://issuetracker.google.com/402800800). The Play AAB is split per device by Play.
  */
-def enableProguardInReleaseBuilds = false
+def enableSeparateBuildPerCPUArchitecture = project.hasProperty("splitApks")
+
+/** versionName comes from apps/mobile/package.json so it matches APP_VERSION in JS. */
+def appVersionName = new JsonSlurper().parse(file("../../package.json")).version
+
+/** Bump for every Play upload: ./gradlew bundleRelease -PversionCode=2 */
+def appVersionCode = (project.findProperty("versionCode") ?: "1").toInteger()
+
+/**
+ * Release signing from android/keystore.properties (gitignored), e.g.
+ *   storeFile=../../saddahaq-upload.jks
+ *   storePassword=...
+ *   keyAlias=upload
+ *   keyPassword=...
+ * Without it, release builds fall back to the debug key: fine on your own phone,
+ * rejected by the Play Store.
+ */
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.withInputStream { keystoreProperties.load(it) }
+}
+def hasReleaseKeystore = keystoreProperties.getProperty("storeFile") != null
 
 /**
  * The preferred build flavor of JavaScriptCore (JSC)
@@ -83,8 +114,16 @@ android {
         applicationId "com.saddahaq"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode appVersionCode
+        versionName appVersionName
+    }
+    splits {
+        abi {
+            reset()
+            enable enableSeparateBuildPerCPUArchitecture
+            universalApk false
+            include(*reactNativeArchitectures())
+        }
     }
     signingConfigs {
         debug {
@@ -93,19 +132,37 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        if (hasReleaseKeystore) {
+            release {
+                storeFile file(keystoreProperties.getProperty("storeFile"))
+                storePassword keystoreProperties.getProperty("storePassword")
+                keyAlias keystoreProperties.getProperty("keyAlias")
+                keyPassword keystoreProperties.getProperty("keyPassword")
+            }
+        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            if (hasReleaseKeystore) {
+                signingConfig signingConfigs.release
+            } else {
+                logger.warn("SaddaHaQ: android/keystore.properties not found; signing release with the DEBUG key (not uploadable to Play).")
+                signingConfig signingConfigs.debug
+            }
             minifyEnabled enableProguardInReleaseBuilds
+            shrinkResources enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
     }
+}
+
+/** Architectures from gradle.properties (or -PreactNativeArchitectures=...). */
+def reactNativeArchitectures() {
+    def value = project.getProperties().get("reactNativeArchitectures")
+    return value ? value.split(",") : ["armeabi-v7a", "x86", "x86_64", "arm64-v8a"]
 }
 
 dependencies {

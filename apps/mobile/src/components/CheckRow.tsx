@@ -33,7 +33,7 @@ export function CheckRow({
         minHeight: TOUCH_TARGET + 8,
         paddingHorizontal: spacing.md,
         borderRadius: radii.md,
-        backgroundColor: colors.surface,
+        backgroundColor: checked ? colors.goodSoft : colors.surface,
         opacity: pressed ? 0.85 : 1,
       })}
     >
@@ -41,17 +41,22 @@ export function CheckRow({
         style={{
           width: 28,
           height: 28,
-          borderRadius: radii.sm,
+          borderRadius: radii.pill,
           borderWidth: 2,
-          borderColor: checked ? colors.accent : colors.textMuted,
-          backgroundColor: checked ? colors.accent : 'transparent',
+          borderColor: checked ? colors.good : colors.textMuted,
+          backgroundColor: checked ? colors.good : 'transparent',
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        {checked ? <Icon name="check" size={18} color={colors.onAccent} /> : null}
+        {checked ? <Icon name="check" size={18} color={colors.onGood} /> : null}
       </View>
-      <AppText variant="body" style={{ flex: 1 }}>
+      <AppText
+        variant="body"
+        weight={checked ? 'bold' : 'regular'}
+        color={checked ? colors.onGoodSoft : colors.text}
+        style={{ flex: 1 }}
+      >
         {label}
       </AppText>
     </Pressable>

@@ -58,6 +58,7 @@ class TextRecognizerModule(private val context: ReactApplicationContext) :
         promise.reject("failed", e.message ?: "Text recognition failed", e)
       } finally {
         deleteIfInCache(uri)
+        deletePickerLeftovers()
       }
     }
   }
@@ -80,6 +81,16 @@ class TextRecognizerModule(private val context: ReactApplicationContext) :
     }
   }
 
+  /**
+   * react-native-image-picker 8.3.0 also copies the full-size original into the
+   * cache for every pick (getOriginalFilePath → getAppSpecificStorageUri) and never
+   * deletes it. The app only uses the picker for OCR, so every such copy goes.
+   */
+  private fun deletePickerLeftovers() {
+    context.cacheDir.listFiles { file -> file.isFile && file.name.startsWith(PICKER_PREFIX) }
+      ?.forEach { it.delete() }
+  }
+
   override fun invalidate() {
     executor.shutdown()
     super.invalidate()
@@ -88,5 +99,6 @@ class TextRecognizerModule(private val context: ReactApplicationContext) :
   companion object {
     const val NAME = "TextRecognizer"
     private const val RECOGNIZER_COUNT = 2
+    private const val PICKER_PREFIX = "rn_image_picker_lib_temp_"
   }
 }

@@ -15,7 +15,10 @@ import { type OnboardingStackParamList } from '../../navigation/types';
 import { chooseLanguage } from '../../services/session';
 import { setSession, useSession } from '../../state/sessionStore';
 import { useTheme } from '../../theme/ThemeProvider';
-import { TOUCH_TARGET } from '../../theme/tokens';
+import { TOUCH_TARGET, cardShadow } from '../../theme/tokens';
+
+/** Each language shown in its own script, so it is recognisable without reading. */
+const LANGUAGE_GLYPH: Record<Language, string> = { hi: 'अ', en: 'A' };
 
 type Props = NativeStackScreenProps<OnboardingStackParamList, 'Language'>;
 
@@ -55,7 +58,7 @@ export function LanguageScreen({ navigation }: Props) {
         />
       }
     >
-      <ScreenHeader title={t('language.title')} subtitle={t('language.subtitle')} />
+      <ScreenHeader title={t('language.title')} subtitle={t('language.subtitle')} icon="globe" />
       <View style={{ gap: spacing.sm }} accessibilityRole="radiogroup">
         {LANGUAGES.map(language => {
           const selected = language === current;
@@ -74,15 +77,35 @@ export function LanguageScreen({ navigation }: Props) {
                 flexDirection: 'row',
                 alignItems: 'center',
                 gap: spacing.md,
-                minHeight: TOUCH_TARGET + 24,
-                paddingHorizontal: spacing.lg,
+                minHeight: TOUCH_TARGET + 40,
+                paddingHorizontal: spacing.md,
                 borderWidth: 2,
-                borderRadius: radii.md,
-                borderColor: selected ? colors.accent : colors.border,
+                borderRadius: radii.lg,
+                borderColor: selected ? colors.accent : colors.surfaceRaised,
                 backgroundColor: selected ? colors.accentSoft : colors.surfaceRaised,
+                ...cardShadow(colors.shadow),
               }}
             >
-              <Icon name="globe" color={selected ? colors.onAccentSoft : colors.textMuted} />
+              <View
+                accessibilityElementsHidden
+                importantForAccessibility="no-hide-descendants"
+                style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: radii.md,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: selected ? colors.accent : colors.surface,
+                }}
+              >
+                <AppText
+                  variant="title"
+                  weight="bold"
+                  color={selected ? colors.onAccent : colors.text}
+                >
+                  {LANGUAGE_GLYPH[language]}
+                </AppText>
+              </View>
               <AppText
                 variant="title"
                 style={{ flex: 1 }}
@@ -90,7 +113,12 @@ export function LanguageScreen({ navigation }: Props) {
               >
                 {t(`language.${language}`)}
               </AppText>
-              {selected ? <Icon name="check" color={colors.onAccentSoft} /> : null}
+              <Icon
+                name="checkCircle"
+                filled={selected}
+                size={28}
+                color={selected ? colors.accent : colors.border}
+              />
             </Pressable>
           );
         })}

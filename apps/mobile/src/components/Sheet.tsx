@@ -53,11 +53,24 @@ export function Sheet({
           style={{
             maxHeight: '90%',
             backgroundColor: colors.background,
-            borderTopLeftRadius: radii.lg,
-            borderTopRightRadius: radii.lg,
+            borderTopLeftRadius: radii.xl,
+            borderTopRightRadius: radii.xl,
             paddingBottom: insets.bottom,
           }}
         >
+          {/* Grab handle: a visual cue that this is a sheet over the screen. */}
+          <View
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+            style={{
+              alignSelf: 'center',
+              width: 44,
+              height: 5,
+              marginTop: spacing.xs,
+              borderRadius: radii.pill,
+              backgroundColor: colors.border,
+            }}
+          />
           <View
             style={{
               flexDirection: 'row',
@@ -78,7 +91,7 @@ export function Sheet({
                 </AppText>
               ) : null}
             </View>
-            <IconButton icon="close" accessibilityLabel={t('log.close')} onPress={onClose} />
+            <IconButton icon="close" accessibilityLabel={t('log.close')} onPress={onClose} filled />
           </View>
           <ScrollView
             contentContainerStyle={{ padding: spacing.md, gap: spacing.md }}

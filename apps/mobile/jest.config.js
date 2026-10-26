@@ -12,6 +12,7 @@ const transpile = [
   'react-native-get-random-values',
   'react-native-image-picker',
   '@shopify',
+  '@sentry',
   'i18next',
   'react-i18next',
   'zustand',

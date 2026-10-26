@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { TextInput, type TextInputProps, View } from 'react-native';
 
 import { useTheme } from '../theme/ThemeProvider';
@@ -11,8 +11,17 @@ export interface TextFieldProps extends TextInputProps {
   error?: string | null;
 }
 
-export function TextField({ label, prefix, error, style, ...rest }: TextFieldProps) {
+export function TextField({
+  label,
+  prefix,
+  error,
+  style,
+  onFocus,
+  onBlur,
+  ...rest
+}: TextFieldProps) {
   const { colors, radii, spacing, fontSizes } = useTheme();
+  const [focused, setFocused] = useState(false);
 
   return (
     <View style={{ gap: spacing.xs }}>
@@ -25,21 +34,32 @@ export function TextField({ label, prefix, error, style, ...rest }: TextFieldPro
           alignItems: 'center',
           minHeight: TOUCH_TARGET + 8,
           borderWidth: 2,
-          borderColor: error ? colors.danger : colors.border,
-          borderRadius: radii.md,
+          borderColor: error ? colors.danger : focused ? colors.accent : colors.border,
+          borderRadius: radii.lg,
           backgroundColor: colors.surfaceRaised,
           paddingHorizontal: spacing.md,
           gap: spacing.xs,
         }}
       >
         {prefix ? (
-          <AppText variant="title" tone="muted" accessibilityElementsHidden>
-            {prefix}
-          </AppText>
+          <View
+            style={{
+              paddingRight: spacing.sm,
+              marginRight: spacing.xxs,
+              borderRightWidth: 1.5,
+              borderRightColor: colors.border,
+            }}
+          >
+            <AppText variant="title" tone="muted" accessibilityElementsHidden>
+              {prefix}
+            </AppText>
+          </View>
         ) : null}
         <TextInput
           accessibilityLabel={label}
           placeholderTextColor={colors.textMuted}
+          cursorColor={colors.accent}
+          selectionColor={colors.accentSoft}
           maxFontSizeMultiplier={2}
           style={[
             {
@@ -53,6 +73,14 @@ export function TextField({ label, prefix, error, style, ...rest }: TextFieldPro
             },
             style,
           ]}
+          onFocus={event => {
+            setFocused(true);
+            onFocus?.(event);
+          }}
+          onBlur={event => {
+            setFocused(false);
+            onBlur?.(event);
+          }}
           {...rest}
         />
       </View>

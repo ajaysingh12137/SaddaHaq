@@ -5,6 +5,7 @@ import { View } from 'react-native';
 
 import { AppText } from '../../components/AppText';
 import { Button } from '../../components/Button';
+import { Card } from '../../components/Card';
 import { CheckRow } from '../../components/CheckRow';
 import { Icon, type IconName } from '../../components/Icon';
 import { InfoBanner } from '../../components/InfoBanner';
@@ -86,24 +87,37 @@ export function EshramGuideScreen({ navigation }: Props) {
         subtitle={t('eshram.subtitle')}
         onBack={navigation.goBack}
         backLabel={t('common.back')}
+        icon="idCard"
       />
       {anyPlaceholder ? (
         <InfoBanner tone="warning" message={t('eshram.placeholder')} testID="eshram-placeholder" />
       ) : null}
 
       {step ? (
-        <View
-          style={{
-            gap: spacing.md,
-            padding: spacing.md,
-            borderRadius: radii.lg,
-            borderWidth: 1,
-            borderColor: colors.border,
-          }}
-        >
-          <AppText variant="caption" tone="muted" testID="eshram-step-count">
-            {t('eshram.stepOf', { current: current + 1, total })}
-          </AppText>
+        <Card style={{ gap: spacing.md }}>
+          <View style={{ gap: spacing.xs }}>
+            <AppText variant="caption" weight="bold" tone="accent" testID="eshram-step-count">
+              {t('eshram.stepOf', { current: current + 1, total })}
+            </AppText>
+            {/* One segment per step: done steps filled, the rest on the track. */}
+            <View
+              style={{ flexDirection: 'row', gap: spacing.xxs }}
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+            >
+              {Array.from({ length: total }, (_, i) => (
+                <View
+                  key={i}
+                  style={{
+                    flex: 1,
+                    height: 6,
+                    borderRadius: radii.pill,
+                    backgroundColor: i <= current ? colors.accent : colors.track,
+                  }}
+                />
+              ))}
+            </View>
+          </View>
           <View
             style={{
               height: 140,
@@ -146,19 +160,21 @@ export function EshramGuideScreen({ navigation }: Props) {
               />
             </View>
           </View>
-        </View>
+        </Card>
       ) : null}
 
-      <AppText variant="title">{t('eshram.checklistTitle')}</AppText>
-      {CHECKLIST_ITEMS.map(item => (
-        <CheckRow
-          key={item}
-          label={t(CHECKLIST_LABELS[item])}
-          checked={checklist[item]}
-          onChange={checked => setItem(item, checked)}
-          testID={`eshram-check-${item}`}
-        />
-      ))}
+      <Card>
+        <AppText variant="title">{t('eshram.checklistTitle')}</AppText>
+        {CHECKLIST_ITEMS.map(item => (
+          <CheckRow
+            key={item}
+            label={t(CHECKLIST_LABELS[item])}
+            checked={checklist[item]}
+            onChange={checked => setItem(item, checked)}
+            testID={`eshram-check-${item}`}
+          />
+        ))}
+      </Card>
       <InfoBanner message={t('eshram.privacy')} icon="shield" />
       <InfoBanner message={t('eshram.cscHelp')} />
 
@@ -170,7 +186,7 @@ export function EshramGuideScreen({ navigation }: Props) {
         onChange={value => void setEshramRegistered(value)}
         testID="eshram-registered"
       />
-      {lastVerified ? (
+      {lastVerified && !anyPlaceholder ? (
         <AppText variant="caption" tone="muted">
           {t('eshram.lastVerified', { date: formatDate(lastVerified, t) })}
         </AppText>

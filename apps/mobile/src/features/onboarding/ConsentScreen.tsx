@@ -5,7 +5,9 @@ import { View } from 'react-native';
 
 import { AppText } from '../../components/AppText';
 import { Button } from '../../components/Button';
-import { Icon, type IconName } from '../../components/Icon';
+import { Card } from '../../components/Card';
+import { type IconName } from '../../components/Icon';
+import { IconCircle } from '../../components/IconCircle';
 import { ReadAloudButton } from '../../components/ReadAloudButton';
 import { Screen } from '../../components/Screen';
 import { ScreenHeader } from '../../components/ScreenHeader';
@@ -17,12 +19,12 @@ import { useTheme } from '../../theme/ThemeProvider';
 
 type Props = NativeStackScreenProps<OnboardingStackParamList, 'Consent'>;
 
-const SECTIONS: Array<{ icon: IconName; title: string; body: string }> = [
+const SECTIONS: Array<{ icon: IconName; title: string; body: string; good?: boolean }> = [
   { icon: 'phone', title: 'consent.storeTitle', body: 'consent.storeBody' },
-  { icon: 'shield', title: 'consent.neverTitle', body: 'consent.neverBody' },
-  { icon: 'chart', title: 'consent.whyTitle', body: 'consent.whyBody' },
-  { icon: 'calendar', title: 'consent.screenshotTitle', body: 'consent.screenshotBody' },
-  { icon: 'info', title: 'consent.deleteTitle', body: 'consent.deleteBody' },
+  { icon: 'lock', title: 'consent.neverTitle', body: 'consent.neverBody', good: true },
+  { icon: 'target', title: 'consent.whyTitle', body: 'consent.whyBody' },
+  { icon: 'image', title: 'consent.screenshotTitle', body: 'consent.screenshotBody' },
+  { icon: 'trash', title: 'consent.deleteTitle', body: 'consent.deleteBody' },
 ];
 
 export function ConsentScreen({ navigation, route }: Props) {
@@ -38,6 +40,7 @@ export function ConsentScreen({ navigation, route }: Props) {
   const values = { single: config.singleThreshold, multi: config.multiThreshold };
   const sections = SECTIONS.map(s => ({
     icon: s.icon,
+    good: s.good === true,
     title: t(s.title as 'consent.storeTitle'),
     body: t(s.body as 'consent.storeBody', values),
   }));
@@ -73,19 +76,29 @@ export function ConsentScreen({ navigation, route }: Props) {
         title={t('consent.title')}
         onBack={navigation.goBack}
         backLabel={t('common.back')}
+        icon="shield"
       />
       <ReadAloudButton text={script} testID="consent-read-aloud" />
-      {sections.map(section => (
-        <View key={section.title} style={{ flexDirection: 'row', gap: spacing.sm }}>
-          <Icon name={section.icon} color={colors.accent} />
-          <View style={{ flex: 1, gap: spacing.xxs }}>
-            <AppText variant="body" weight="bold">
-              {section.title}
-            </AppText>
-            <AppText variant="body">{section.body}</AppText>
+      <Card style={{ gap: spacing.md }}>
+        {sections.map(section => (
+          <View key={section.title} style={{ flexDirection: 'row', gap: spacing.sm }}>
+            <IconCircle
+              name={section.icon}
+              size={40}
+              color={section.good ? colors.good : colors.accent}
+              background={section.good ? colors.goodSoft : colors.accentSoft}
+            />
+            <View style={{ flex: 1, gap: spacing.xxs }}>
+              <AppText variant="body" weight="bold">
+                {section.title}
+              </AppText>
+              <AppText variant="body" tone="muted">
+                {section.body}
+              </AppText>
+            </View>
           </View>
-        </View>
-      ))}
+        ))}
+      </Card>
       <AppText variant="caption" tone="muted">
         {t('consent.estimateNote')}
       </AppText>

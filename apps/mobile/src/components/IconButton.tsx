@@ -2,7 +2,7 @@ import React from 'react';
 import { Pressable } from 'react-native';
 
 import { useTheme } from '../theme/ThemeProvider';
-import { TOUCH_TARGET } from '../theme/tokens';
+import { TOUCH_TARGET, cardShadow } from '../theme/tokens';
 import { Icon, type IconName } from './Icon';
 
 export function IconButton({
@@ -10,15 +10,18 @@ export function IconButton({
   accessibilityLabel,
   onPress,
   color,
+  filled = false,
   testID,
 }: {
   icon: IconName;
   accessibilityLabel: string;
   onPress: () => void;
   color?: string;
+  /** Draw a white circle behind the icon (back buttons, sheet close). */
+  filled?: boolean;
   testID?: string;
 }) {
-  const { radii } = useTheme();
+  const { colors, radii } = useTheme();
   return (
     <Pressable
       onPress={onPress}
@@ -33,9 +36,12 @@ export function IconButton({
         alignItems: 'center',
         justifyContent: 'center',
         opacity: pressed ? 0.6 : 1,
+        ...(filled
+          ? { backgroundColor: colors.surfaceRaised, ...cardShadow(colors.shadow) }
+          : null),
       })}
     >
-      <Icon name={icon} size={26} color={color} />
+      <Icon name={icon} size={filled ? 24 : 26} color={color} />
     </Pressable>
   );
 }

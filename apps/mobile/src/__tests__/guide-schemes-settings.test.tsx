@@ -163,9 +163,8 @@ describe('schemes', () => {
     // No invented website or helpline.
     expect(screen.queryByTestId('scheme-open-website')).toBeNull();
     expect(screen.queryByTestId('scheme-call')).toBeNull();
-    expect(screen.getByTestId('scheme-last-verified')).toHaveTextContent(
-      'Last checked: 15 October 2026',
-    );
+    // Placeholder text was never checked, so no "last checked" date is shown.
+    expect(screen.queryByTestId('scheme-last-verified')).toBeNull();
   });
 
   it('shows fresh server content and uses the server thresholds on Home', async () => {
@@ -196,6 +195,9 @@ describe('schemes', () => {
     await fireEvent.press(await screen.findByTestId('scheme-' + verified.id));
     await screen.findByTestId('scheme-detail-screen');
     expect(screen.queryByTestId('scheme-placeholder')).toBeNull();
+    expect(screen.getByTestId('scheme-last-verified')).toHaveTextContent(
+      'Last checked: 18 October 2026',
+    );
     await fireEvent.press(screen.getByTestId('scheme-call'));
     expect(openURL).toHaveBeenCalledWith('tel:1800000000');
     await fireEvent.press(screen.getByTestId('scheme-open-website'));

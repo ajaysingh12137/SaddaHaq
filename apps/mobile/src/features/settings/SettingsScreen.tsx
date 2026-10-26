@@ -7,6 +7,8 @@ import { type Language } from '@saddahaq/shared';
 import { ApiError } from '../../api/errors';
 import { AppText } from '../../components/AppText';
 import { Button } from '../../components/Button';
+import { Card } from '../../components/Card';
+import { Icon, type IconName } from '../../components/Icon';
 import { ChoiceGroup } from '../../components/ChoiceGroup';
 import { InfoBanner } from '../../components/InfoBanner';
 import { usePlatformName } from '../../components/PlatformTile';
@@ -28,11 +30,15 @@ const SPEEDS = [
   { value: 1.25, label: 'settings.speedFast' },
 ] as const;
 
-function SectionTitle({ children }: { children: string }) {
+function SectionTitle({ children, icon }: { children: string; icon: IconName }) {
+  const { colors, spacing } = useTheme();
   return (
-    <AppText variant="title" style={{ marginTop: 8 }}>
-      {children}
-    </AppText>
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs, marginTop: 8 }}>
+      <Icon name={icon} size={22} color={colors.accent} />
+      <AppText variant="title" accessibilityRole="header" style={{ flex: 1 }}>
+        {children}
+      </AppText>
+    </View>
   );
 }
 
@@ -123,27 +129,30 @@ export function SettingsScreen() {
         </AppText>
       ) : null}
 
-      <ChoiceGroup<Language>
-        label={t('settings.language')}
-        choices={[
-          { value: 'hi', label: t('language.hi') },
-          { value: 'en', label: t('language.en') },
-        ]}
-        value={language}
-        onChange={value => void chooseLanguage(value)}
-        testIDPrefix="settings-language"
-      />
+      <SectionTitle icon="globe">{t('settings.languageVoiceTitle')}</SectionTitle>
+      <Card style={{ gap: spacing.md }}>
+        <ChoiceGroup<Language>
+          label={t('settings.language')}
+          choices={[
+            { value: 'hi', label: t('language.hi') },
+            { value: 'en', label: t('language.en') },
+          ]}
+          value={language}
+          onChange={value => void chooseLanguage(value)}
+          testIDPrefix="settings-language"
+        />
 
-      <ChoiceGroup<number>
-        label={t('settings.speechTitle')}
-        choices={SPEEDS.map(s => ({ value: s.value, label: t(s.label) }))}
-        value={speechRate}
-        onChange={value => void setSpeechRate(value)}
-        testIDPrefix="settings-speed"
-      />
-      <ReadAloudButton text={t('settings.speechSample')} />
+        <ChoiceGroup<number>
+          label={t('settings.speechTitle')}
+          choices={SPEEDS.map(s => ({ value: s.value, label: t(s.label) }))}
+          value={speechRate}
+          onChange={value => void setSpeechRate(value)}
+          testIDPrefix="settings-speed"
+        />
+        <ReadAloudButton text={t('settings.speechSample')} />
+      </Card>
 
-      <SectionTitle>{t('settings.privacyTitle')}</SectionTitle>
+      <SectionTitle icon="lock">{t('settings.privacyTitle')}</SectionTitle>
       <ToggleRow
         icon="cloud"
         title={t('consent.backupTitle')}
@@ -161,30 +170,34 @@ export function SettingsScreen() {
         testID="settings-analytics"
       />
 
-      <SectionTitle>{t('settings.exportTitle')}</SectionTitle>
-      <AppText variant="body" tone="muted">
-        {t('settings.exportBody')}
-      </AppText>
-      <Button
-        variant="secondary"
-        icon="download"
-        label={t('settings.export')}
-        onPress={() => void onExport()}
-        testID="settings-export"
-      />
+      <SectionTitle icon="fileText">{t('settings.exportTitle')}</SectionTitle>
+      <Card>
+        <AppText variant="body" tone="muted">
+          {t('settings.exportBody')}
+        </AppText>
+        <Button
+          variant="secondary"
+          icon="download"
+          label={t('settings.export')}
+          onPress={() => void onExport()}
+          testID="settings-export"
+        />
+      </Card>
 
-      <SectionTitle>{t('settings.deleteTitle')}</SectionTitle>
-      <AppText variant="body" tone="muted">
-        {t('settings.deleteBody')}
-      </AppText>
-      <Button
-        variant="ghost"
-        icon="trash"
-        label={t('settings.delete')}
-        onPress={onDelete}
-        loading={deleting}
-        testID="settings-delete"
-      />
+      <SectionTitle icon="trash">{t('settings.deleteTitle')}</SectionTitle>
+      <Card>
+        <AppText variant="body" tone="muted">
+          {t('settings.deleteBody')}
+        </AppText>
+        <Button
+          variant="danger"
+          icon="trash"
+          label={t('settings.delete')}
+          onPress={onDelete}
+          loading={deleting}
+          testID="settings-delete"
+        />
+      </Card>
 
       <View style={{ paddingVertical: spacing.md }}>
         <AppText variant="caption" tone="muted" center testID="settings-version">

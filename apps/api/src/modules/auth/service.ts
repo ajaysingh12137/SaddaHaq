@@ -29,7 +29,7 @@ export async function requestOtp(phone: string, ctx: AppContext): Promise<OtpReq
     }
   }
 
-  const otp = generateOtp();
+  const otp = ctx.otpProvider.fixedCode ?? generateOtp();
   await OtpModel.findOneAndUpdate(
     { phoneHash },
     {
@@ -54,7 +54,11 @@ export async function requestOtp(phone: string, ctx: AppContext): Promise<OtpReq
     throw error;
   }
 
-  return { expiresInSec: OTP_TTL_SEC, resendAfterSec: OTP_RESEND_COOLDOWN_SEC };
+  return {
+    expiresInSec: OTP_TTL_SEC,
+    resendAfterSec: OTP_RESEND_COOLDOWN_SEC,
+    ...(ctx.otpProvider.fixedCode ? { testCode: ctx.otpProvider.fixedCode } : {}),
+  };
 }
 
 export async function verifyOtp(
